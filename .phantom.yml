@@ -1,0 +1,19 @@
+php_versions: ["7.4", "8.0", "8.1", "8.2", "8.3"]
+include:
+  - "**/*.php"
+  - "**/*.js"
+  - "**/*.css"
+exclude:
+  - "vendor/**"
+  - "node_modules/**"
+  - ".git/**"
+checks:
+  readme: true
+  i18n: true
+  security: true
+  accessibility: true
+  performance: false
+ai:
+  enabled: false
+  mode: deep
+  provider: ""
