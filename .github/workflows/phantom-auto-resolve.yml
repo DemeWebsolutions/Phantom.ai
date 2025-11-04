@@ -1,0 +1,51 @@
+name: Phantom Auto-Resolve
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+jobs:
+  auto-resolve:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: '8.1'
+          extensions: mbstring, json
+
+      - name: Composer install
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare artifacts dir
+        run: mkdir -p artifacts && mkdir -p artifacts/patches
+
+      - name: Run PHPCS (WPCS)
+        run: ./vendor/bin/phpcs --standard=WordPress --report=json --report-file=artifacts/phpcs.json || true
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v2
+        with:
+          config: p/ci
+          output: artifacts/semgrep.json
+        continue-on-error: true
+
+      - name: Post-process phantom-report (if using compliance-warnings)
+        run: php phantom-ai/compliance-warnings/src/Handler.php --input artifacts --output artifacts || true
+
+      - name: Run Auto-Resolve (dry-run)
+        run: php phantom-ai/structure-preserving-auto-resolve/src/AutoResolve.php --root=. --output=artifacts --dry-run || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: phantom-auto-resolve-artifacts
+          path: artifacts/
