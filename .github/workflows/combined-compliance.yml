@@ -1,13 +1,6 @@
-# Combined Compliance & Auto-Resolve
-# Runs PHPCS (WPCS) + PHPCompatibility, Semgrep, and PHPStan.
-# Produces JSON artifacts (phpcs.json, phpcompat.json, semgrep.json, phpstan.json),
-# uploads SARIF where available, creates a unified artifacts/phantom-report.json,
-# and annotates PRs using reviewdog (for PHPCS/PHPStan).
-#
-# Notes:
-# - Composer plugins are allowed in CI via composer config step (dealerdirect/phpcodesniffer-composer-installer).
-# - Scan steps are tolerant (non-fatal) so artifacts are always produced for post-processing.
-# - Adjust php versions, phpstan level, and semgrep config as needed.
+# Combined Compliance & Auto-Resolve (robust)
+# Runs PHPCS (WPCS) + PHPCompatibility, Semgrep, PHPStan.
+# Ensures Composer plugin is allowed before install to avoid composer exit code 2.
 on:
   workflow_dispatch:
   pull_request:
@@ -17,11 +10,9 @@ on:
 permissions:
   contents: read
   checks: write
-  issues: write
 
 jobs:
   compliance:
-    name: Compliance scans (PHPCS / PHPCompatibility / Semgrep / PHPStan)
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -35,9 +26,7 @@ jobs:
         run: |
           echo "Branch: $(git rev-parse --abbrev-ref HEAD || true)"
           echo "Commit: $(git rev-parse --short HEAD || true)"
-          echo "Recent commits:"
           git --no-pager log -n 5 --pretty=oneline || true
-          echo "Repo files (top 200):"
           git ls-files | sed -n '1,200p' || true
 
       - name: Set up PHP
@@ -63,10 +52,9 @@ jobs:
 
       - name: Allow required Composer plugin(s)
         run: |
-          # Allow only the PHPCS installer plugin so composer install can run.
+          # Allow only the PHPCS installer plugin so composer install can run non-interactively.
           composer --version
           composer config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true || true
-          # Add additional allow-plugins keys here if you intentionally use other composer plugins.
         env:
           COMPOSER_ALLOW_SUPERUSER: 1
 
@@ -80,164 +68,75 @@ jobs:
       - name: Ensure placeholder artifacts exist (if tools missing)
         run: |
           for f in phpcs.json phpcompat.json semgrep.json phpstan.json; do
-            if [ ! -f artifacts/$f ]; then
-              echo "{}" > artifacts/$f
-            fi
+            if [ ! -f artifacts/$f ]; then echo "{}" > artifacts/$f; fi
           done
 
-      # PHPCS: produce artifacts/phpcs.json (and annotate via reviewdog)
       - name: Run PHPCS -> artifacts/phpcs.json
-        id: phpcs-run
         run: |
           set -o pipefail
           if [ -x vendor/bin/phpcs ]; then
             vendor/bin/phpcs --standard=WordPress --report=json --report-file=artifacts/phpcs.json . || true
-            echo "PHPCS output written to artifacts/phpcs.json"
           else
             echo '{}' > artifacts/phpcs.json
-            echo "PHPCS not installed; placeholder written."
           fi
         continue-on-error: true
 
-      - name: Annotate PHPCS results with reviewdog
-        if: always()
-        uses: reviewdog/action-phpcs@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          # do not fail the job because of reviewdog; we just want annotations
-          fail_on_error: false
-          # run against the repository
-          standard: WordPress
-
-      # PHPCompatibility: run via PHPCS standard PHPCompatibility (writes artifacts/phpcompat.json)
       - name: Run PHPCompatibility (PHPCS) -> artifacts/phpcompat.json
-        id: phpcompat-run
         run: |
           set -o pipefail
-          # If PHPCompatibility is installed as a phpcs standard via composer, use phpcs to run it.
           if [ -x vendor/bin/phpcs ]; then
-            # runtime-set testVersion as needed; adapt to desired target PHP versions
             vendor/bin/phpcs --standard=PHPCompatibility --runtime-set testVersion 7.4-8.1 --report=json --report-file=artifacts/phpcompat.json . || true
-            echo "PHPCompatibility output written to artifacts/phpcompat.json"
           else
             echo '{}' > artifacts/phpcompat.json
-            echo "PHPCompatibility skipped; placeholder written."
           fi
         continue-on-error: true
 
-      # Semgrep: use semgrep-action to produce JSON and SARIF
-      - name: Run Semgrep -> artifacts/semgrep.json + artifacts/semgrep.sarif
-        id: semgrep
+      - name: Run Semgrep -> artifacts/semgrep.json
         uses: returntocorp/semgrep-action@v1
         with:
-          # choose config: p/ci or your repo-specific rules directory
           config: 'p/ci'
           output: artifacts/semgrep.json
-          # semgrep-action will also emit sarif to the working directory (if configured)
         continue-on-error: true
 
-      # PHPStan: produce JSON output
       - name: Run PHPStan -> artifacts/phpstan.json
-        id: phpstan
         run: |
           set -o pipefail
           if [ -x vendor/bin/phpstan ]; then
-            # adjust level and config path as needed; produce JSON
             vendor/bin/phpstan analyse --error-format=json -l 5 --no-progress --no-interaction . > artifacts/phpstan.json || true
-            echo "PHPStan output written to artifacts/phpstan.json"
           else
             echo '{}' > artifacts/phpstan.json
-            echo "PHPStan not installed; placeholder written."
-          fi
-        continue-on-error: true
-
-      - name: Annotate PHPStan results with reviewdog
-        if: always()
-        uses: reviewdog/action-phpstan@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          fail_on_error: false
-          level: 5
-
-      - name: Convert Semgrep JSON -> SARIF (if not already present)
-        run: |
-          # semgrep-action often produces SARIF; if not, try to convert or skip.
-          if [ -f artifacts/semgrep.sarif ]; then
-            echo "Semgrep SARIF already present: artifacts/semgrep.sarif"
-          elif [ -f artifacts/semgrep.json ]; then
-            # Try to use semgrep CLI to produce SARIF (if semgrep binary available).
-            if command -v semgrep >/dev/null 2>&1; then
-              semgrep --config p/ci --output artifacts/semgrep.sarif --json || true
-              echo "Converted semgrep.json to SARIF (artifacts/semgrep.sarif)"
-            else
-              echo "No semgrep binary to convert JSON to SARIF; skipping."
-            fi
-          else
-            echo "No semgrep output found; skipping SARIF conversion."
           fi
         continue-on-error: true
 
       - name: Build unified phantom-report.json
-        id: build-report
         run: |
-          # Ensure files exist (placeholders already created above)
-          for f in artifacts/phpcs.json artifacts/phpcompat.json artifacts/semgrep.json artifacts/phpstan.json; do
-            if [ ! -f "$f" ]; then
-              echo "{}" > "$f"
-            fi
-          done
-
-          # Merge the per-tool outputs into one unified phantom-report.json.
-          # Use jq to build a simple correlated wrapper. If jq missing, fall back to a minimal PHP generator.
           if command -v jq >/dev/null 2>&1; then
             jq -n \
-              --slurpfile phpcs artifacts/phpcs.json \
-              --slurpfile phpcompat artifacts/phpcompat.json \
-              --slurpfile semgrep artifacts/semgrep.json \
-              --slurpfile phpstan artifacts/phpstan.json \
-              '{
-                generated_at: (now | todate),
-                generator: "combined-compliance-workflow",
-                tools_reported: ["phpcs","phpcompat","semgrep","phpstan"],
-                phpcs: $phpcs[0],
-                phpcompat: $phpcompat[0],
-                semgrep: $semgrep[0],
-                phpstan: $phpstan[0]
-              }' > artifacts/phantom-report.json
-            echo "Unified phantom-report.json written (jq)."
+            --slurpfile phpcs artifacts/phpcs.json \
+            --slurpfile phpcompat artifacts/phpcompat.json \
+            --slurpfile semgrep artifacts/semgrep.json \
+            --slurpfile phpstan artifacts/phpstan.json \
+            '{
+              generated_at: (now | todate),
+              generator: "combined-compliance-workflow",
+              phpcs: $phpcs[0],
+              phpcompat: $phpcompat[0],
+              semgrep: $semgrep[0],
+              phpstan: $phpstan[0]
+            }' > artifacts/phantom-report.json
           else
-            # Minimal PHP fallback: create a JSON wrapper with raw file content strings
             php -r '
             $out = [
               "generated_at" => gmdate("c"),
               "generator" => "combined-compliance-workflow",
-              "tools_reported" => ["phpcs","phpcompat","semgrep","phpstan"],
               "phpcs" => json_decode(file_get_contents("artifacts/phpcs.json"), true),
               "phpcompat" => json_decode(file_get_contents("artifacts/phpcompat.json"), true),
               "semgrep" => json_decode(file_get_contents("artifacts/semgrep.json"), true),
-              "phpstan" => json_decode(file_get_contents("artifacts/phpstan.json"), true),
+              "phpstan" => json_decode(file_get_contents("artifacts/phpstan.json"), true)
             ];
-            file_put_contents("artifacts/phantom-report.json", json_encode($out, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            echo "Unified phantom-report.json written (php)."
+            file_put_contents("artifacts/phantom-report.json", json_encode($out, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
             '
           fi
-        continue-on-error: false
-
-      - name: Upload SARIF if available (Semgrep)
-        if: always() && (exists('artifacts/semgrep.sarif') || exists('artifacts/semgrep.sarif'))
-        run: |
-          # Use the upload-sarif action below (action expects a sarif file path), we will set an output flag
-          echo "SARIF upload will be attempted if artifacts/semgrep.sarif exists."
-        continue-on-error: true
-
-      - name: Upload SARIF (semgrep) to Code Scanning (if present)
-        if: always() && ( -f artifacts/semgrep.sarif )
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: artifacts/semgrep.sarif
-        continue-on-error: true
 
       - name: Upload artifacts bundle
         uses: actions/upload-artifact@v4
@@ -245,14 +144,11 @@ jobs:
           name: phantom-artifacts
           path: artifacts/
 
-      - name: Final artifact preview (first lines)
+      - name: Final artifact preview
         run: |
-          echo "Preview: artifacts/phantom-report.json"
           head -n 200 artifacts/phantom-report.json || true
-          echo
           for f in artifacts/phpcs.json artifacts/phpcompat.json artifacts/semgrep.json artifacts/phpstan.json; do
             echo "---- $f ----"
             head -n 80 "$f" || true
-            echo
           done
         continue-on-error: true
