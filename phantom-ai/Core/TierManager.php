@@ -36,16 +36,7 @@ class TierManager {
     public function classify_task( string $task_description, array $context = [] ): array {
         $task_description_lower = strtolower( $task_description );
         
-        // Code generation patterns
-        if ( $this->is_code_generation_task( $task_description_lower ) ) {
-            return [
-                'tier' => self::TIER_HIGH,
-                'task_type' => self::TASK_CODE_GENERATION,
-                'reason' => 'Requires code implementation',
-            ];
-        }
-
-        // Review patterns
+        // Review patterns - check first as they should take priority
         if ( $this->is_review_task( $task_description_lower ) ) {
             return [
                 'tier' => self::TIER_MID,
@@ -60,6 +51,15 @@ class TierManager {
                 'tier' => self::TIER_MID,
                 'task_type' => self::TASK_TESTING,
                 'reason' => 'Requires testing or verification',
+            ];
+        }
+
+        // Code generation patterns
+        if ( $this->is_code_generation_task( $task_description_lower ) ) {
+            return [
+                'tier' => self::TIER_HIGH,
+                'task_type' => self::TASK_CODE_GENERATION,
+                'reason' => 'Requires code implementation',
             ];
         }
 
@@ -86,7 +86,10 @@ class TierManager {
             'add function',
             'write code',
             'develop',
-            'code',
+            'code ',
+            'custom block',
+            'plugin',
+            'theme',
         ];
 
         foreach ( $patterns as $pattern ) {
@@ -131,10 +134,11 @@ class TierManager {
      */
     private function is_testing_task( string $task ): bool {
         $patterns = [
-            'test',
+            ' test ',
             'run tests',
             'unit test',
             'integration test',
+            'testing',
         ];
 
         foreach ( $patterns as $pattern ) {
