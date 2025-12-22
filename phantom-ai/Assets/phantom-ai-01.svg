@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="phantomGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Ghost/Phantom shape -->
+  <path d="M 100 40 C 70 40 50 60 50 90 L 50 140 C 50 150 55 160 60 160 L 70 160 L 70 150 L 80 160 L 90 150 L 100 160 L 110 150 L 120 160 L 130 150 L 130 160 L 140 160 C 145 160 150 150 150 140 L 150 90 C 150 60 130 40 100 40 Z" 
+        fill="url(#phantomGradient1)" 
+        stroke="#4f46e5" 
+        stroke-width="2"/>
+  
+  <!-- Eyes -->
+  <circle cx="80" cy="85" r="8" fill="#fff"/>
+  <circle cx="120" cy="85" r="8" fill="#fff"/>
+  <circle cx="82" cy="87" r="4" fill="#1e1b4b"/>
+  <circle cx="122" cy="87" r="4" fill="#1e1b4b"/>
+  
+  <!-- AI circuit elements -->
+  <line x1="100" y1="100" x2="100" y2="120" stroke="#a5b4fc" stroke-width="2"/>
+  <circle cx="100" cy="120" r="3" fill="#c7d2fe"/>
+  <line x1="100" y1="120" x2="85" y2="130" stroke="#a5b4fc" stroke-width="1.5"/>
+  <line x1="100" y1="120" x2="115" y2="130" stroke="#a5b4fc" stroke-width="1.5"/>
+  <circle cx="85" cy="130" r="2" fill="#c7d2fe"/>
+  <circle cx="115" cy="130" r="2" fill="#c7d2fe"/>
+</svg>

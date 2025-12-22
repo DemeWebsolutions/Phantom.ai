@@ -7,6 +7,7 @@ exclude:
   - "vendor/**"
   - "node_modules/**"
   - ".git/**"
+  - "phantom-metadata/**"
 checks:
   readme: true
   i18n: true
@@ -14,6 +15,11 @@ checks:
   accessibility: true
   performance: false
 ai:
-  enabled: false
+  enabled: true
   mode: deep
-  provider: ""
+  provider: "phantom"
+workflow:
+  tier_system: true
+  metadata_tracking: true
+  learning_enabled: true
+  copilot_integration: true

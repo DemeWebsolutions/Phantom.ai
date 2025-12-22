@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "phantom-ai/example-block",
+  "version": "1.0.0",
+  "title": "Example Block",
+  "category": "widgets",
+  "icon": "smiley",
+  "description": "Example block created with Phantom.ai workflow",
+  "supports": {
+    "html": false,
+    "align": true,
+    "color": {
+      "background": true,
+      "text": true
+    }
+  },
+  "attributes": {
+    "content": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "textdomain": "phantom-ai",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css",
+  "style": "file:./style.css"
+}
