@@ -1,0 +1,217 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Phantom.ai Workflow CLI
+ *
+ * Command-line interface for Phantom.ai workflow automation
+ *
+ * @package PhantomAI
+ */
+
+// Autoload
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use PhantomAI\Core\TierManager;
+use PhantomAI\Workflow\TaskRouter;
+use PhantomAI\Learning\MetadataTracker;
+use PhantomAI\Learning\LearningEngine;
+
+/**
+ * Display help message
+ */
+function display_help() {
+	echo "Phantom.ai Workflow CLI\n";
+	echo "========================\n\n";
+	echo "Usage: phantom-cli <command> [options]\n\n";
+	echo "Commands:\n";
+	echo "  process <task>        Process a new task through the workflow\n";
+	echo "  classify <task>       Classify a task and show tier recommendation\n";
+	echo "  stats                 Display performance statistics\n";
+	echo "  report                Generate full performance report\n";
+	echo "  copilot <task-id>     Generate Copilot-ready prompt for a task\n";
+	echo "  help                  Display this help message\n\n";
+	echo "Examples:\n";
+	echo "  ./phantom-cli process \"Create a product grid block\"\n";
+	echo "  ./phantom-cli classify \"Review code for security issues\"\n";
+	echo "  ./phantom-cli stats\n";
+	echo "  ./phantom-cli copilot task-12345\n";
+}
+
+/**
+ * Process a task
+ *
+ * @param string $task_description Task description
+ */
+function process_task( $task_description ) {
+	$router = new TaskRouter();
+	$task_id = 'task-' . uniqid();
+	
+	echo "Processing task: $task_id\n";
+	echo "Description: $task_description\n\n";
+	
+	$result = $router->process_task( $task_id, $task_description );
+	
+	echo "Status: {$result['status']}\n";
+	
+	if ( $result['status'] === 'clarification_needed' ) {
+		echo "Clarification needed:\n";
+		foreach ( $result['questions'] as $question ) {
+			echo "  - $question\n";
+		}
+	} else {
+		echo "Tier: {$result['tier']}\n";
+		echo "Task Type: {$result['task_type']}\n";
+		echo "Reason: {$result['reason']}\n";
+		echo "Copilot Ready: " . ( $result['copilot_ready'] ? 'Yes' : 'No' ) . "\n";
+		
+		if ( $result['copilot_ready'] ) {
+			echo "\nUse 'phantom-cli copilot $task_id' to generate Copilot prompt.\n";
+		}
+	}
+}
+
+/**
+ * Classify a task
+ *
+ * @param string $task_description Task description
+ */
+function classify_task( $task_description ) {
+	$tier_manager = new TierManager();
+	$classification = $tier_manager->classify_task( $task_description );
+	
+	echo "Task Classification\n";
+	echo "===================\n";
+	echo "Tier: {$classification['tier']}\n";
+	echo "Task Type: {$classification['task_type']}\n";
+	echo "Reason: {$classification['reason']}\n";
+	
+	$cost_multiplier = $tier_manager->get_tier_cost_multiplier( $classification['tier'] );
+	echo "Cost Multiplier: {$cost_multiplier}x\n";
+}
+
+/**
+ * Display statistics
+ */
+function display_stats() {
+	$tracker = new MetadataTracker();
+	$stats = $tracker->get_performance_stats();
+	
+	echo "Performance Statistics\n";
+	echo "======================\n";
+	echo "Total Tasks: {$stats['total_tasks']}\n";
+	echo "Success Rate: " . number_format( $stats['success_rate'], 2 ) . "%\n";
+	echo "Average Iterations: " . number_format( $stats['avg_iterations'], 2 ) . "\n\n";
+	
+	echo "Tier Distribution:\n";
+	foreach ( $stats['tier_distribution'] as $tier => $count ) {
+		$percentage = $stats['total_tasks'] > 0 
+			? ( $count / $stats['total_tasks'] ) * 100 
+			: 0;
+		echo sprintf( "  %s: %d (%.1f%%)\n", ucfirst( $tier ), $count, $percentage );
+	}
+	
+	echo "\nToken Usage:\n";
+	echo "  Input: " . ( $stats['total_tokens']['input'] ?? 0 ) . "\n";
+	echo "  Output: " . ( $stats['total_tokens']['output'] ?? 0 ) . "\n";
+}
+
+/**
+ * Generate full report
+ */
+function generate_report() {
+	$tracker = new MetadataTracker();
+	echo $tracker->generate_report();
+	
+	$engine = new LearningEngine( $tracker );
+	$recommendations = $engine->get_optimization_recommendations();
+	
+	if ( ! empty( $recommendations ) ) {
+		echo "\n=== Optimization Recommendations ===\n\n";
+		foreach ( $recommendations as $rec ) {
+			echo "[{$rec['priority']}] {$rec['category']}: {$rec['message']}\n";
+		}
+	}
+}
+
+/**
+ * Generate Copilot prompt
+ *
+ * @param string $task_id Task ID
+ */
+function generate_copilot_prompt( $task_id ) {
+	$tracker = new MetadataTracker();
+	$metadata = $tracker->get_task_metadata( $task_id );
+	
+	if ( ! $metadata ) {
+		echo "Error: Task not found: $task_id\n";
+		return;
+	}
+	
+	$router = new TaskRouter();
+	$task_info = [
+		'compressed_prompt' => $metadata['compressed_prompt'] ?? $metadata['task_description'] ?? '',
+		'tier' => $metadata['tier_used'] ?? 'high',
+		'task_type' => $metadata['task_type'] ?? 'code_generation',
+	];
+	
+	$files = $metadata['files_to_modify'] ?? [];
+	$constraints = $metadata['constraints'] ?? [];
+	$svg_assets = [ 'phantom-ai-01.svg', 'phantom-ai-02.svg' ];
+	
+	$prompt = $router->generate_copilot_prompt( $task_info, $files, $constraints, $svg_assets );
+	
+	echo "=== Copilot-Ready Prompt ===\n\n";
+	echo $prompt;
+	echo "\n\n=== End of Prompt ===\n";
+	echo "\nCopy the above prompt and paste it into Copilot.\n";
+}
+
+// Main execution
+if ( $argc < 2 ) {
+	display_help();
+	exit( 1 );
+}
+
+$command = $argv[1];
+
+switch ( $command ) {
+	case 'process':
+		if ( $argc < 3 ) {
+			echo "Error: Missing task description\n";
+			echo "Usage: phantom-cli process \"<task description>\"\n";
+			exit( 1 );
+		}
+		process_task( $argv[2] );
+		break;
+		
+	case 'classify':
+		if ( $argc < 3 ) {
+			echo "Error: Missing task description\n";
+			echo "Usage: phantom-cli classify \"<task description>\"\n";
+			exit( 1 );
+		}
+		classify_task( $argv[2] );
+		break;
+		
+	case 'stats':
+		display_stats();
+		break;
+		
+	case 'report':
+		generate_report();
+		break;
+		
+	case 'copilot':
+		if ( $argc < 3 ) {
+			echo "Error: Missing task ID\n";
+			echo "Usage: phantom-cli copilot <task-id>\n";
+			exit( 1 );
+		}
+		generate_copilot_prompt( $argv[2] );
+		break;
+		
+	case 'help':
+	default:
+		display_help();
+		break;
+}
