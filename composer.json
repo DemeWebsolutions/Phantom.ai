@@ -1,8 +1,7 @@
 {
   "name": "demewebsolutions/phantom-ai",
-  "description": "Phantom AI tooling for WordPress plugin compliance and automated remediation with tiered workflow automation",
+  "description": "Phantom AI tooling for WordPress plugin compliance and automated remediation",
   "type": "project",
-  "keywords": ["wordpress", "ai", "workflow", "automation", "copilot", "compliance"],
   "require": {
     "php": ">=7.4",
     "nikic/php-parser": "^4.15"
@@ -21,11 +20,5 @@
     "psr-4": {
       "PhantomAI\\": "phantom-ai/"
     }
-  },
-  "bin": [
-    "phantom-ai/phantom-cli"
-  ],
-  "scripts": {
-    "phantom": "phantom-ai/phantom-cli"
   }
 }
