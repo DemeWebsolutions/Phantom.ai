@@ -1,3 +1,34 @@
+<?php
+/**
+ * Phantom.ai Dashboard
+ * Main dashboard interface with authentication
+ *
+ * @package PhantomAI\Dashboard
+ */
+
+require_once __DIR__ . '/includes/security.php';
+
+// Enforce localhost access
+enforce_localhost();
+
+// Initialize session
+init_security_session();
+
+// Check authentication
+if ( ! is_authenticated() ) {
+header( 'Location: login.php' );
+exit;
+}
+
+// Handle logout
+if ( isset( $_GET['logout'] ) ) {
+logout_user();
+header( 'Location: login.php' );
+exit;
+}
+
+$username = $_SESSION['username'] ?? 'User';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +36,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phantom.ai Dashboard</title>
     <link rel="stylesheet" href="assets/css/dashboard.css">
+    <style>
+        .security-banner {
+            background-color: rgba(243, 156, 18, 0.15);
+            border-bottom: 2px solid var(--warning-color);
+            padding: 0.75rem 2rem;
+            text-align: center;
+            color: var(--warning-color);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .security-banner::before {
+            content: "⚠️ ";
+        }
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background-color: var(--error-color);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.3s;
+            margin-left: 1rem;
+        }
+        .btn-logout:hover {
+            background-color: #c0392b;
+        }
+        .user-info {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-right: 1rem;
+        }
+    </style>
 </head>
 <body>
+    <div class="security-banner">
+        Internal system. Authorized access only. All activity is logged.
+    </div>
     <div class="dashboard-container">
         <header class="dashboard-header">
             <div class="logo-section">
@@ -20,6 +87,9 @@
             <div class="header-actions">
                 <button id="refresh-btn" class="btn-refresh">Refresh Data</button>
             </div>
+                <span class="user-info">👤 <?php echo htmlspecialchars( $username ); ?></span>
+                <button id="refresh-btn" class="btn-refresh">Refresh Data</button>
+                <a href="?logout=1" class="btn-logout">Logout</a>
         </header>
 
         <nav class="dashboard-nav">

@@ -1,0 +1,29 @@
+<?php
+/**
+ * Authentication Configuration - EXAMPLE
+ * 
+ * SETUP INSTRUCTIONS:
+ * 1. Copy this file to auth.php: cp auth.php.example auth.php
+ * 2. Generate a new password hash: php -r "echo password_hash('your_password', PASSWORD_BCRYPT);"
+ * 3. Update the password_hash value below with your generated hash
+ * 4. Change the username if desired
+ * 5. Keep auth.php secure and never commit to version control
+ * 
+ * @package PhantomAI\Dashboard\Security
+ */
+
+return [
+	// Authentication credentials
+	// CHANGE THESE IMMEDIATELY
+	'username' => 'phantom_admin',
+	'password_hash' => '$2y$10$23y.JAEy/bF10EEJVz2nYOSgsiL2Vx6WceJatis4whjdXTHQZEuNm', // Default: phantom_secure_2025
+	
+	// Session settings
+	'session_timeout' => 3600, // 1 hour
+	'session_name' => 'PHANTOM_SESSION',
+	
+	// Rate limiting
+	'rate_limit_attempts' => 5,
+	'rate_limit_window' => 600, // 10 minutes in seconds
+	'rate_limit_lockout' => 900, // 15 minutes in seconds
+];

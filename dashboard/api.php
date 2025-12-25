@@ -6,6 +6,25 @@
  * @package PhantomAI\Dashboard
  */
 
+require_once __DIR__ . '/includes/security.php';
+
+// Enforce localhost access
+enforce_localhost();
+
+// Initialize session
+init_security_session();
+
+// Check authentication
+if ( ! is_authenticated() ) {
+	http_response_code( 401 );
+	header( 'Content-Type: application/json' );
+	echo json_encode([
+		'success' => false,
+		'error' => 'Authentication required',
+	]);
+	exit;
+}
+
 // Set headers for JSON response
 header( 'Content-Type: application/json' );
 header( 'Access-Control-Allow-Origin: *' );
