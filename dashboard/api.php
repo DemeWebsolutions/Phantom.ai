@@ -10,11 +10,6 @@
 header( 'Content-Type: application/json' );
 header( 'Access-Control-Allow-Origin: *' );
 
-// Autoload Phantom.ai classes
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use PhantomAI\Learning\MetadataTracker;
-
 /**
  * Get system status data
  *
@@ -94,19 +89,33 @@ function get_artifacts_status(): array {
 }
 
 /**
- * Get tier usage statistics
+ * Get tier usage statistics from metadata files
  *
  * @return array Tier usage counts
  */
 function get_tier_usage(): array {
-	$tracker = new MetadataTracker();
-	$stats = $tracker->get_performance_stats();
+	$metadata_dir = __DIR__ . '/../phantom-metadata/';
 	
-	return [
-		'cheap' => $stats['tier_distribution']['cheap'] ?? 0,
-		'mid'   => $stats['tier_distribution']['mid'] ?? 0,
-		'high'  => $stats['tier_distribution']['high'] ?? 0,
+	$usage = [
+		'cheap' => 0,
+		'mid'   => 0,
+		'high'  => 0,
 	];
+	
+	if ( ! is_dir( $metadata_dir ) ) {
+		return $usage;
+	}
+	
+	$files = glob( $metadata_dir . '*.json' );
+	foreach ( $files as $file ) {
+		$data = json_decode( file_get_contents( $file ), true );
+		$tier = $data['tier_used'] ?? '';
+		if ( isset( $usage[ $tier ] ) ) {
+			$usage[ $tier ]++;
+		}
+	}
+	
+	return $usage;
 }
 
 /**
@@ -115,15 +124,29 @@ function get_tier_usage(): array {
  * @return array Escalation stats
  */
 function get_escalation_stats(): array {
-	$tracker = new MetadataTracker();
-	$stats = $tracker->get_performance_stats();
+	$metadata_dir = __DIR__ . '/../phantom-metadata/';
 	
-	$total = $stats['tier_distribution']['high'] ?? 0;
-	$success_rate = $stats['success_rate'] ?? 0;
+	$total = 0;
+	$successful = 0;
+	
+	if ( is_dir( $metadata_dir ) ) {
+		$files = glob( $metadata_dir . '*.json' );
+		foreach ( $files as $file ) {
+			$data = json_decode( file_get_contents( $file ), true );
+			if ( ( $data['tier_used'] ?? '' ) === 'high' ) {
+				$total++;
+				if ( ( $data['review_result'] ?? '' ) === 'PASS' ) {
+					$successful++;
+				}
+			}
+		}
+	}
+	
+	$success_rate = $total > 0 ? ( $successful / $total ) * 100 : 0;
 	
 	return [
 		'total'       => $total,
-		'successRate' => $success_rate,
+		'successRate' => round( $success_rate, 1 ),
 	];
 }
 
@@ -133,11 +156,10 @@ function get_escalation_stats(): array {
  * @return array Workflow stats
  */
 function get_workflow_stats(): array {
-	$tracker = new MetadataTracker();
-	$all_metadata = $tracker->get_all_metadata();
+	$metadata_dir = __DIR__ . '/../phantom-metadata/';
 	
 	$stats = [
-		'intake'        => count( $all_metadata ),
+		'intake'        => 0,
 		'cheap'         => 0,
 		'comprehension' => 0,
 		'mid'           => 0,
@@ -146,9 +168,18 @@ function get_workflow_stats(): array {
 		'learning'      => 0,
 	];
 	
-	foreach ( $all_metadata as $metadata ) {
+	if ( ! is_dir( $metadata_dir ) ) {
+		return $stats;
+	}
+	
+	$files = glob( $metadata_dir . '*.json' );
+	$stats['intake'] = count( $files );
+	
+	foreach ( $files as $file ) {
+		$data = json_decode( file_get_contents( $file ), true );
+		
 		// Count by tier
-		$tier = $metadata['tier_used'] ?? '';
+		$tier = $data['tier_used'] ?? '';
 		if ( $tier === 'cheap' ) {
 			$stats['cheap']++;
 		} elseif ( $tier === 'mid' ) {
@@ -158,12 +189,12 @@ function get_workflow_stats(): array {
 		}
 		
 		// Count comprehension checks
-		if ( isset( $metadata['comprehension'] ) && $metadata['comprehension'] === 'YES' ) {
+		if ( isset( $data['comprehension'] ) && $data['comprehension'] === 'YES' ) {
 			$stats['comprehension']++;
 		}
 		
 		// Count artifacts and learning updates
-		if ( isset( $metadata['review_result'] ) ) {
+		if ( isset( $data['review_result'] ) ) {
 			$stats['artifacts']++;
 			$stats['learning']++;
 		}
