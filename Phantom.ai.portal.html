@@ -470,35 +470,36 @@
         .main-content {
             flex: 1;
             padding: var(--space-lg);
-            overflow: hidden;
+            overflow-y: auto;
             background: var(--bg-main);
         }
 
         .three-column-grid {
-            display: inline-grid;
-                grid-template-columns: 25% 50% 25%;
-                gap: 16px;
-                height: 100%;
-                width: 100%;
+            display: grid;
+            grid-template-columns: 25% 50% 25%;
+            gap: 16px;
+            min-height: 100%;
+            width: 100%;
         }
 
         /* CANONICAL COLUMN PANEL - LOCKED (SVG Authority) */
         .column-panel {
             border-radius: 1.5rem;
-            overflow: hidden;
+            overflow: visible;
             display: flex;
             flex-direction: column;
+            min-height: 0;
         }
 
         /* CANONICAL SHADOW WINDOW - LOCKED (SVG Authority) */
         .shadow-window {
             border-radius: var(--radius-md);
             padding: var(--space-md);
-            min-height: 360px;
-            max-height: 200px;
+            min-height: 200px;
+            max-height: 400px;
             overflow-y: auto;
             position: relative;
-            margin-bottom: 0;
+            margin-bottom: var(--space-md);
         }
 
         .shadow-window-header {
@@ -579,6 +580,8 @@
         .panel-body {
             flex: 1;
             padding: var(--space-md);
+            overflow-y: auto;
+            max-height: calc(100vh - 400px);
         }
 
         .panel-body::-webkit-scrollbar {
@@ -1055,17 +1058,9 @@
                     <!-- LEFT COLUMN: GATING & ACTIONS -->
                     <div class="column-panel" style="
         background: linear-gradient(180deg, transparent 25%, #686a6bba 100%);
-        /* border-radius: 1.5rem; */
-        /* box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); */
-        /* padding: 3rem; */
-        /* width: 100%; */
-        /* max-width: 28rem; */
         border: none;
-        height: 615px;
     ">
-                        <div class="shadow-window" style="
-    height: 300px;
-">
+                        <div class="shadow-window">
                             <div class="shadow-window-header">
                                 <span class="shadow-window-title">Actions Window <span class="badge" id="actionStatus">Awaiting</span></span>
                                 <div class="shadow-window-controls">
@@ -1088,19 +1083,8 @@
                             </div>
                         </div>
 
-                        <div class="panel-header" style="
-    margin-top: unset;
-    border-bottom-width: 0px;
-    padding-bottom: 26px;
-    margin-bottom: 10px;
-">Gating &amp; Validation</div>
-                        <div class="panel-body" style="
-    height: 568px;
-    /* margin-bottom: 100px; */
-    padding-bottom: unset;
-    margin-top: unset;
-    padding-top: unset;
-">
+                        <div class="panel-header">Gating &amp; Validation</div>
+                        <div class="panel-body">
                             <div class="checkbox-item">
                                 <input type="checkbox" id="g1" checked="" onchange="updateCostEstimate()">
                                 <label for="g1">Include artifacts</label>
@@ -1127,12 +1111,8 @@
                     <!-- CENTER COLUMN: AI INTERACTION & FILE CONTROL -->
                     <div class="column-panel" style="
         background: linear-gradient(180deg, transparent 60%, #686a6bba 100%);
-        /* min-height: auto; */
-        height: 1015px;
     ">
-                        <div class="shadow-window" style="
-    min-height: 480px;
-">
+                        <div class="shadow-window">
                             <div class="shadow-window-header">
                                 <span class="shadow-window-title">AI Response <span class="badge processing" id="aiStatus" style="display:none;">Processing</span></span>
                                 <div class="shadow-window-controls">
@@ -1152,8 +1132,7 @@
                         </div>
 
                         <div class="panel-header">AI Interaction &amp; File Control</div>
-                        <div class="panel-body" style="
-">
+                        <div class="panel-body">
                             <div class="file-selector">
                                 <div class="file-selector-toggle" onclick="toggleFileSelector()">
                                     <span>📁 File / Project Selector</span>
@@ -1197,46 +1176,10 @@
 
                     <!-- RIGHT COLUMN: OUTPUT & ESCALATION -->
                     <div class="column-panel" style="
-        .phantom-shadow-window {
-        background: linear-gradient(
-        180deg,
-        #161c2f 0%,
-        #121826 100%
-      );
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 10px;
-        box-shadow:
-        0 8px 24px rgba(0,0,0,0.55);
-        padding: 16px;
-        margin-bottom: 16px;
-    };
         background: linear-gradient(180deg, transparent 25%, #686a6bba 100%);
-        /* background: linear-gradient(    180deg,    #161c2f 0%,    #121826 100%  ); */
         border-radius: 1.5rem;
-        /* box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); */
-        /* padding: 3rem; */
-        /* width: 100%; */
-        /* max-width: 28rem; */
-        /* background: linear-gradient(
-        180deg,
-        #161c2f 0%,
-        #121826 100%
-      ); */
-        /* border: 1px solid rgba(255,255,255,0.08); */
-        /* border-radius: 10px; */
-        /* box-shadow:
-        0 6px 18px rgba(0,0,0,0.45); */
-        /* padding: 16px; */
-        /* background: linear-gradient(
-        180deg,
-        #161c2f 0%,
-        #121826 100%
-      ); */
-        height: 615px;
     ">
-                        <div class="shadow-window" style="
-        /* background: linear-gradient(180deg, white 0%, #686a6b 100%); */
-    ">
+                        <div class="shadow-window">
                             <div class="shadow-window-header">
                                 <span class="shadow-window-title">Output Area <span class="badge success" id="outputStatus" style="display:none;">Complete</span></span>
                                 <div class="shadow-window-controls">
@@ -1296,10 +1239,7 @@
                         </div>
                     
                     
-                        <div class="panel-btn-section" style="
-    margin-top: -490px;
-    margin-top: -359px;
-">
+                        <div class="panel-btn-section">
                             <div class="form-group">
                                 <label class="form-label">Validation Status</label>
                                 <button class="action-button" id="passBtn" onclick="handlePass()" style="
@@ -1344,10 +1284,7 @@
                             
                             
                             
-                        </div><div class="panel-btn-section" style="
-    top: 100px;
-    margin-top: -359px;
-">
+                        </div><div class="panel-btn-section">
                             <div class="form-group">
                                 <label class="form-label">AI Tier</label>
                                 <select class="form-control" id="aiTier" onchange="updateCostEstimate()">
