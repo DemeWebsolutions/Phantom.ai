@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Phantom.ai Dashboard - Workflow Automation & Analytics</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		:root {
+			--primary-color: #6366f1;
+			--secondary-color: #8b5cf6;
+			--success-color: #10b981;
+			--warning-color: #f59e0b;
+			--danger-color: #ef4444;
+			--dark-bg: #0f172a;
+			--card-bg: #1e293b;
+			--text-primary: #f1f5f9;
+			--text-secondary: #94a3b8;
+			--border-color: #334155;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+			background: linear-gradient(135deg, var(--dark-bg) 0%, #1e293b 100%);
+			color: var(--text-primary);
+			line-height: 1.6;
+			min-height: 100vh;
+		}
+
+		.dashboard-container {
+			max-width: 1400px;
+			margin: 0 auto;
+			padding: 2rem;
+		}
+
+		header {
+			background: var(--card-bg);
+			border-radius: 12px;
+			padding: 2rem;
+			margin-bottom: 2rem;
+			border: 1px solid var(--border-color);
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		}
+
+		.header-content {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.logo-section {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.logo {
+			width: 60px;
+			height: 60px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.logo img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+
+		h1 {
+			font-size: 2rem;
+			font-weight: 700;
+			color: var(--text-primary);
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+		
+		@supports not (-webkit-background-clip: text) {
+			h1 {
+				color: var(--primary-color);
+			}
+		}
+
+		.subtitle {
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+			margin-top: 0.25rem;
+		}
+
+		.status-badge {
+			display: inline-block;
+			padding: 0.5rem 1rem;
+			background: var(--success-color);
+			color: white;
+			border-radius: 20px;
+			font-size: 0.85rem;
+			font-weight: 600;
+		}
+
+		.metrics-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.metric-card {
+			background: var(--card-bg);
+			border: 1px solid var(--border-color);
+			border-radius: 12px;
+			padding: 1.5rem;
+			transition: transform 0.2s, box-shadow 0.2s;
+		}
+
+		.metric-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.3);
+		}
+
+		.metric-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 1rem;
+		}
+
+		.metric-title {
+			color: var(--text-secondary);
+			font-size: 0.85rem;
+			text-transform: uppercase;
+			font-weight: 600;
+			letter-spacing: 0.5px;
+		}
+
+		.metric-icon {
+			width: 40px;
+			height: 40px;
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 20px;
+		}
+
+		.metric-value {
+			font-size: 2.5rem;
+			font-weight: 700;
+			margin-bottom: 0.5rem;
+		}
+
+		.metric-change {
+			font-size: 0.85rem;
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+		}
+
+		.metric-change.positive {
+			color: var(--success-color);
+		}
+
+		.metric-change.negative {
+			color: var(--danger-color);
+		}
+
+		.content-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+			gap: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.card {
+			background: var(--card-bg);
+			border: 1px solid var(--border-color);
+			border-radius: 12px;
+			padding: 1.5rem;
+		}
+
+		.card-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 1.5rem;
+			padding-bottom: 1rem;
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		.card-title {
+			font-size: 1.25rem;
+			font-weight: 600;
+		}
+
+		.tier-distribution {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.tier-item {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.tier-label {
+			min-width: 100px;
+			font-weight: 600;
+		}
+
+		.tier-bar {
+			flex: 1;
+			height: 30px;
+			border-radius: 6px;
+			position: relative;
+			overflow: hidden;
+			background: rgba(255, 255, 255, 0.05);
+		}
+
+		.tier-bar-fill {
+			height: 100%;
+			border-radius: 6px;
+			display: flex;
+			align-items: center;
+			padding: 0 1rem;
+			font-size: 0.85rem;
+			font-weight: 600;
+			transition: width 0.3s ease;
+		}
+
+		.tier-cheap { background: linear-gradient(90deg, #10b981, #059669); }
+		.tier-mid { background: linear-gradient(90deg, #f59e0b, #d97706); }
+		.tier-high { background: linear-gradient(90deg, #6366f1, #4f46e5); }
+
+		.task-list {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.task-item {
+			background: rgba(255, 255, 255, 0.03);
+			border: 1px solid var(--border-color);
+			border-radius: 8px;
+			padding: 1rem;
+			transition: background 0.2s;
+		}
+
+		.task-item:hover {
+			background: rgba(255, 255, 255, 0.05);
+		}
+
+		.task-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 0.5rem;
+		}
+
+		.task-id {
+			font-family: monospace;
+			font-size: 0.85rem;
+			color: var(--primary-color);
+			font-weight: 600;
+		}
+
+		.task-status {
+			padding: 0.25rem 0.75rem;
+			border-radius: 12px;
+			font-size: 0.75rem;
+			font-weight: 600;
+		}
+
+		.task-status.completed { background: var(--success-color); color: white; }
+		.task-status.in-progress { background: var(--warning-color); color: white; }
+		.task-status.failed { background: var(--danger-color); color: white; }
+
+		.task-description {
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.task-meta {
+			display: flex;
+			gap: 1rem;
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+		}
+
+		.performance-chart {
+			height: 200px;
+			display: flex;
+			align-items: flex-end;
+			gap: 0.5rem;
+			padding: 1rem 0;
+		}
+
+		.chart-bar {
+			flex: 1;
+			background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+			border-radius: 4px 4px 0 0;
+			min-height: 20px;
+			position: relative;
+			transition: all 0.3s ease;
+		}
+
+		.chart-bar:hover {
+			opacity: 0.8;
+		}
+
+		.chart-label {
+			position: absolute;
+			bottom: -20px;
+			left: 50%;
+			transform: translateX(-50%);
+			font-size: 0.7rem;
+			color: var(--text-secondary);
+			white-space: nowrap;
+		}
+
+		.insights-list {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.insight-item {
+			display: flex;
+			gap: 1rem;
+			padding: 1rem;
+			background: rgba(255, 255, 255, 0.03);
+			border-radius: 8px;
+			border-left: 3px solid var(--primary-color);
+		}
+
+		.insight-icon {
+			font-size: 1.5rem;
+		}
+
+		.insight-content h4 {
+			margin-bottom: 0.25rem;
+			font-size: 0.95rem;
+		}
+
+		.insight-content p {
+			color: var(--text-secondary);
+			font-size: 0.85rem;
+		}
+
+		.stats-row {
+			display: flex;
+			justify-content: space-between;
+			padding: 0.75rem 0;
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		.stats-row:last-child {
+			border-bottom: none;
+		}
+
+		.stats-label {
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+		}
+
+		.stats-value {
+			font-weight: 600;
+			font-size: 0.95rem;
+		}
+
+		@media (max-width: 768px) {
+			.dashboard-container {
+				padding: 1rem;
+			}
+
+			h1 {
+				font-size: 1.5rem;
+			}
+
+			.metrics-grid,
+			.content-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		.refresh-button {
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+			color: white;
+			border: none;
+			padding: 0.5rem 1.5rem;
+			border-radius: 8px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: transform 0.2s, box-shadow 0.2s;
+		}
+
+		.refresh-button:hover {
+			transform: scale(1.05);
+			box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+		}
+
+		.full-width {
+			grid-column: 1 / -1;
+		}
+
+		.toast-notification {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: var(--card-bg);
+			border: 1px solid var(--success-color);
+			border-left: 4px solid var(--success-color);
+			border-radius: 8px;
+			padding: 1rem 1.5rem;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+			opacity: 0;
+			transform: translateX(400px);
+			transition: opacity 0.3s, transform 0.3s;
+			z-index: 1000;
+			max-width: 300px;
+		}
+
+		.toast-notification.show {
+			opacity: 1;
+			transform: translateX(0);
+		}
+
+		.toast-notification .toast-title {
+			font-weight: 600;
+			margin-bottom: 0.25rem;
+		}
+
+		.toast-notification .toast-message {
+			color: var(--text-secondary);
+			font-size: 0.85rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="dashboard-container">
+		<header>
+			<div class="header-content">
+				<div class="logo-section">
+					<div class="logo">
+						<img src="Assets/phantom-ai-02.svg" alt="Phantom.ai Logo">
+					</div>
+					<div>
+						<h1>Phantom.ai Dashboard</h1>
+						<p class="subtitle">Workflow Automation & Analytics</p>
+					</div>
+				</div>
+				<div>
+					<span class="status-badge">● System Active</span>
+				</div>
+			</div>
+		</header>
+
+		<div class="metrics-grid">
+			<div class="metric-card">
+				<div class="metric-header">
+					<span class="metric-title">Total Tasks</span>
+					<div class="metric-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">📊</div>
+				</div>
+				<div class="metric-value" id="total-tasks">1,247</div>
+				<div class="metric-change positive">
+					<span>↑ 12.5%</span>
+					<span style="color: var(--text-secondary);">vs last month</span>
+				</div>
+			</div>
+
+			<div class="metric-card">
+				<div class="metric-header">
+					<span class="metric-title">Success Rate</span>
+					<div class="metric-icon" style="background: linear-gradient(135deg, #10b981, #059669);">✓</div>
+				</div>
+				<div class="metric-value" id="success-rate">94.2%</div>
+				<div class="metric-change positive">
+					<span>↑ 2.1%</span>
+					<span style="color: var(--text-secondary);">vs last month</span>
+				</div>
+			</div>
+
+			<div class="metric-card">
+				<div class="metric-header">
+					<span class="metric-title">Avg Response Time</span>
+					<div class="metric-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">⚡</div>
+				</div>
+				<div class="metric-value" id="avg-time">2.4s</div>
+				<div class="metric-change positive">
+					<span>↓ 15%</span>
+					<span style="color: var(--text-secondary);">vs last month</span>
+				</div>
+			</div>
+
+			<div class="metric-card">
+				<div class="metric-header">
+					<span class="metric-title">Cost Savings</span>
+					<div class="metric-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">💰</div>
+				</div>
+				<div class="metric-value" id="cost-savings">$4,892</div>
+				<div class="metric-change positive">
+					<span>↑ 23.7%</span>
+					<span style="color: var(--text-secondary);">vs last month</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="content-grid">
+			<div class="card">
+				<div class="card-header">
+					<h2 class="card-title">Tier Distribution</h2>
+					<button class="refresh-button" onclick="refreshData()">Refresh</button>
+				</div>
+				<div class="tier-distribution">
+					<div class="tier-item">
+						<span class="tier-label">Cheap/Fast</span>
+						<div class="tier-bar">
+							<div class="tier-bar-fill tier-cheap" style="width: 65%;">65%</div>
+						</div>
+					</div>
+					<div class="tier-item">
+						<span class="tier-label">Mid-Tier</span>
+						<div class="tier-bar">
+							<div class="tier-bar-fill tier-mid" style="width: 25%;">25%</div>
+						</div>
+					</div>
+					<div class="tier-item">
+						<span class="tier-label">High-Tier</span>
+						<div class="tier-bar">
+							<div class="tier-bar-fill tier-high" style="width: 10%;">10%</div>
+						</div>
+					</div>
+				</div>
+				<div style="margin-top: 1.5rem;">
+					<div class="stats-row">
+						<span class="stats-label">Total API Calls</span>
+						<span class="stats-value">1,247</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Cheap Tier Calls</span>
+						<span class="stats-value">811</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Mid Tier Calls</span>
+						<span class="stats-value">312</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">High Tier Calls</span>
+						<span class="stats-value">124</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-header">
+					<h2 class="card-title">Recent Tasks</h2>
+				</div>
+				<div class="task-list">
+					<div class="task-item">
+						<div class="task-header">
+							<span class="task-id">task-a8f3d2</span>
+							<span class="task-status completed">Completed</span>
+						</div>
+						<p class="task-description">Create product grid block with category filtering</p>
+						<div class="task-meta">
+							<span>Tier: High</span>
+							<span>Duration: 3.2s</span>
+							<span>2 min ago</span>
+						</div>
+					</div>
+
+					<div class="task-item">
+						<div class="task-header">
+							<span class="task-id">task-b7e2c1</span>
+							<span class="task-status completed">Completed</span>
+						</div>
+						<p class="task-description">Review security validation in auth.php</p>
+						<div class="task-meta">
+							<span>Tier: Mid</span>
+							<span>Duration: 1.8s</span>
+							<span>15 min ago</span>
+						</div>
+					</div>
+
+					<div class="task-item">
+						<div class="task-header">
+							<span class="task-id">task-c6d1a0</span>
+							<span class="task-status in-progress">In Progress</span>
+						</div>
+						<p class="task-description">Optimize database queries for performance</p>
+						<div class="task-meta">
+							<span>Tier: Mid</span>
+							<span>Duration: 0.5s</span>
+							<span>Just now</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-header">
+					<h2 class="card-title">Performance Trends</h2>
+				</div>
+				<div class="performance-chart">
+					<div class="chart-bar" style="height: 60%;">
+						<span class="chart-label">Mon</span>
+					</div>
+					<div class="chart-bar" style="height: 75%;">
+						<span class="chart-label">Tue</span>
+					</div>
+					<div class="chart-bar" style="height: 85%;">
+						<span class="chart-label">Wed</span>
+					</div>
+					<div class="chart-bar" style="height: 70%;">
+						<span class="chart-label">Thu</span>
+					</div>
+					<div class="chart-bar" style="height: 90%;">
+						<span class="chart-label">Fri</span>
+					</div>
+					<div class="chart-bar" style="height: 65%;">
+						<span class="chart-label">Sat</span>
+					</div>
+					<div class="chart-bar" style="height: 55%;">
+						<span class="chart-label">Sun</span>
+					</div>
+				</div>
+				<div style="margin-top: 2rem;">
+					<div class="stats-row">
+						<span class="stats-label">Peak Performance Day</span>
+						<span class="stats-value">Friday</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Average Daily Tasks</span>
+						<span class="stats-value">178</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Week-over-Week Growth</span>
+						<span class="stats-value" style="color: var(--success-color);">+12.5%</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-header">
+					<h2 class="card-title">AI Learning Insights</h2>
+				</div>
+				<div class="insights-list">
+					<div class="insight-item">
+						<div class="insight-icon">🎯</div>
+						<div class="insight-content">
+							<h4>Task Classification Accuracy</h4>
+							<p>Tier assignment accuracy improved by 8.3% this week through continuous learning</p>
+						</div>
+					</div>
+
+					<div class="insight-item">
+						<div class="insight-icon">⚡</div>
+						<div class="insight-content">
+							<h4>Response Time Optimization</h4>
+							<p>Average response time decreased by 15% through prompt optimization</p>
+						</div>
+					</div>
+
+					<div class="insight-item">
+						<div class="insight-icon">💡</div>
+						<div class="insight-content">
+							<h4>Pattern Recognition</h4>
+							<p>Identified 23 new task patterns for improved future routing</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card full-width">
+			<div class="card-header">
+				<h2 class="card-title">Workflow Statistics</h2>
+			</div>
+			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+				<div>
+					<div class="stats-row">
+						<span class="stats-label">Total Processing Time</span>
+						<span class="stats-value">42.3 hours</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Avg Task Complexity</span>
+						<span class="stats-value">Medium</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Failed Tasks</span>
+						<span class="stats-value" style="color: var(--danger-color);">72 (5.8%)</span>
+					</div>
+				</div>
+				<div>
+					<div class="stats-row">
+						<span class="stats-label">Clarification Loops</span>
+						<span class="stats-value">156</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Code Generation Tasks</span>
+						<span class="stats-value">124 (9.9%)</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Review Tasks</span>
+						<span class="stats-value">312 (25.0%)</span>
+					</div>
+				</div>
+				<div>
+					<div class="stats-row">
+						<span class="stats-label">Token Usage (Total)</span>
+						<span class="stats-value">2.4M</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Token Usage (Input)</span>
+						<span class="stats-value">1.1M</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Token Usage (Output)</span>
+						<span class="stats-value">1.3M</span>
+					</div>
+				</div>
+				<div>
+					<div class="stats-row">
+						<span class="stats-label">ROI Improvement</span>
+						<span class="stats-value" style="color: var(--success-color);">+23.7%</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">Learning Loop Updates</span>
+						<span class="stats-value">89</span>
+					</div>
+					<div class="stats-row">
+						<span class="stats-label">System Uptime</span>
+						<span class="stats-value">99.8%</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Dashboard functionality
+		let refreshIntervalId = null;
+
+		// Toast notification function
+		function showToast(title, message, duration = 3000) {
+			// Remove any existing toast
+			const existingToast = document.querySelector('.toast-notification');
+			if (existingToast) {
+				existingToast.remove();
+			}
+
+			// Create new toast
+			const toast = document.createElement('div');
+			toast.className = 'toast-notification';
+			toast.innerHTML = `
+				<div class="toast-title">${title}</div>
+				<div class="toast-message">${message}</div>
+			`;
+			toast.setAttribute('role', 'status');
+			toast.setAttribute('aria-live', 'polite');
+			
+			document.body.appendChild(toast);
+
+			// Show toast
+			setTimeout(() => toast.classList.add('show'), 10);
+
+			// Hide and remove toast
+			setTimeout(() => {
+				toast.classList.remove('show');
+				setTimeout(() => toast.remove(), 300);
+			}, duration);
+		}
+
+		function refreshData() {
+			console.log('Refreshing dashboard data...');
+			
+			// Simulate data refresh animation
+			const metrics = document.querySelectorAll('.metric-value');
+			metrics.forEach(metric => {
+				metric.style.opacity = '0.5';
+				setTimeout(() => {
+					metric.style.opacity = '1';
+				}, 300);
+			});
+
+			// Show accessible notification
+			showToast('Success', 'Dashboard data refreshed successfully!');
+		}
+
+		// Animate metrics on load
+		window.addEventListener('load', () => {
+			const metricCards = document.querySelectorAll('.metric-card');
+			metricCards.forEach((card, index) => {
+				card.style.opacity = '0';
+				card.style.transform = 'translateY(20px)';
+				setTimeout(() => {
+					card.style.transition = 'opacity 0.5s, transform 0.5s';
+					card.style.opacity = '1';
+					card.style.transform = 'translateY(0)';
+				}, index * 100);
+			});
+
+			// Animate chart bars
+			const chartBars = document.querySelectorAll('.chart-bar');
+			chartBars.forEach((bar, index) => {
+				const height = bar.style.height;
+				bar.style.height = '0';
+				setTimeout(() => {
+					bar.style.transition = 'height 0.5s ease';
+					bar.style.height = height;
+				}, 500 + (index * 100));
+			});
+
+			// Start auto-refresh when page is visible
+			startAutoRefresh();
+		});
+
+		// Unified auto-refresh with visibility check
+		function performAutoRefresh() {
+			if (!document.hidden) {
+				console.log('Auto-refresh triggered');
+				// In a real implementation, this would fetch new data from an API
+				// Simulated check for new tasks every 30 seconds
+			}
+		}
+
+		function startAutoRefresh() {
+			// Clear any existing intervals
+			if (refreshIntervalId) clearInterval(refreshIntervalId);
+			
+			// Single unified refresh interval (30 seconds)
+			refreshIntervalId = setInterval(performAutoRefresh, 30000);
+		}
+
+		function stopAutoRefresh() {
+			if (refreshIntervalId) {
+				clearInterval(refreshIntervalId);
+				refreshIntervalId = null;
+			}
+		}
+
+		// Pause auto-refresh when page is hidden, resume when visible
+		document.addEventListener('visibilitychange', () => {
+			if (document.hidden) {
+				console.log('Page hidden, pausing auto-refresh');
+				stopAutoRefresh();
+			} else {
+				console.log('Page visible, resuming auto-refresh');
+				startAutoRefresh();
+			}
+		});
+
+		// Cleanup on page unload
+		window.addEventListener('beforeunload', () => {
+			stopAutoRefresh();
+		});
+	</script>
+</body>
+</html>

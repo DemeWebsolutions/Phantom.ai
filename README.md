@@ -11,6 +11,7 @@ Phantom is a comprehensive compliance and review toolchain that unifies WordPres
 - **Copilot integration**: Structured prompt generation for GitHub Copilot
 - **Learning loop**: Continuous optimization based on historical performance
 - **WordPress development**: Block-first templates and wp.org compliance
+- **Analytics Dashboard**: Real-time monitoring of workflow performance and metrics
 
 ## Quick start
 
@@ -49,7 +50,30 @@ Artifacts will be written to `./artifacts`:
 
 # Generate Copilot-ready prompt
 ./phantom-ai/phantom-cli copilot task-12345
+
+# Open the analytics dashboard
+open phantom-ai/dashboard.html
 ```
+
+6) Dashboard
+View real-time workflow analytics and performance metrics:
+```bash
+# Open dashboard in browser
+open phantom-ai/dashboard.html
+
+# Or with a local web server
+cd phantom-ai && python3 -m http.server 8000
+# Visit http://localhost:8000/dashboard.html
+```
+
+The dashboard displays:
+- Task processing metrics and success rates
+- Tier distribution and API usage
+- Performance trends and analytics
+- AI learning insights
+- Cost savings and ROI tracking
+
+See [phantom-ai/DASHBOARD-README.md](phantom-ai/DASHBOARD-README.md) for details.
 
 5) CI
 A GitHub Actions workflow is included at `.github/workflows/phantom-audit.yml`. On each push/PR, it:
