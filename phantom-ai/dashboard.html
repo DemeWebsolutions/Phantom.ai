@@ -62,15 +62,17 @@
 		}
 
 		.logo {
-			width: 50px;
-			height: 50px;
-			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-			border-radius: 10px;
+			width: 60px;
+			height: 60px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			font-size: 24px;
-			font-weight: bold;
+		}
+
+		.logo img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
 		}
 
 		h1 {
@@ -450,7 +452,9 @@
 		<header>
 			<div class="header-content">
 				<div class="logo-section">
-					<div class="logo">Φ</div>
+					<div class="logo">
+						<img src="Assets/phantom-ai-02.svg" alt="Phantom.ai Logo">
+					</div>
 					<div>
 						<h1>Phantom.ai Dashboard</h1>
 						<p class="subtitle">Workflow Automation & Analytics</p>
