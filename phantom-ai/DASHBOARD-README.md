@@ -144,7 +144,7 @@ Full-width comprehensive statistics including:
 
 #### Auto-Refresh
 - Automatic data updates every 30 seconds
-- Background task monitoring every 5 seconds
+- Visibility-aware refresh (pauses when tab is hidden)
 - Seamless real-time updates
 
 #### Animations
