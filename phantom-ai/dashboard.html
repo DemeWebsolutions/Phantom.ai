@@ -76,10 +76,17 @@
 		h1 {
 			font-size: 2rem;
 			font-weight: 700;
+			color: var(--text-primary);
 			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
 			background-clip: text;
+		}
+		
+		@supports not (-webkit-background-clip: text) {
+			h1 {
+				color: var(--primary-color);
+			}
 		}
 
 		.subtitle {
@@ -404,6 +411,38 @@
 		.full-width {
 			grid-column: 1 / -1;
 		}
+
+		.toast-notification {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: var(--card-bg);
+			border: 1px solid var(--success-color);
+			border-left: 4px solid var(--success-color);
+			border-radius: 8px;
+			padding: 1rem 1.5rem;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+			opacity: 0;
+			transform: translateX(400px);
+			transition: opacity 0.3s, transform 0.3s;
+			z-index: 1000;
+			max-width: 300px;
+		}
+
+		.toast-notification.show {
+			opacity: 1;
+			transform: translateX(0);
+		}
+
+		.toast-notification .toast-title {
+			font-weight: 600;
+			margin-bottom: 0.25rem;
+		}
+
+		.toast-notification .toast-message {
+			color: var(--text-secondary);
+			font-size: 0.85rem;
+		}
 	</style>
 </head>
 <body>
@@ -707,6 +746,39 @@
 
 	<script>
 		// Dashboard functionality
+		let refreshIntervalId = null;
+		let updateIntervalId = null;
+
+		// Toast notification function
+		function showToast(title, message, duration = 3000) {
+			// Remove any existing toast
+			const existingToast = document.querySelector('.toast-notification');
+			if (existingToast) {
+				existingToast.remove();
+			}
+
+			// Create new toast
+			const toast = document.createElement('div');
+			toast.className = 'toast-notification';
+			toast.innerHTML = `
+				<div class="toast-title">${title}</div>
+				<div class="toast-message">${message}</div>
+			`;
+			toast.setAttribute('role', 'status');
+			toast.setAttribute('aria-live', 'polite');
+			
+			document.body.appendChild(toast);
+
+			// Show toast
+			setTimeout(() => toast.classList.add('show'), 10);
+
+			// Hide and remove toast
+			setTimeout(() => {
+				toast.classList.remove('show');
+				setTimeout(() => toast.remove(), 300);
+			}, duration);
+		}
+
 		function refreshData() {
 			console.log('Refreshing dashboard data...');
 			
@@ -719,8 +791,8 @@
 				}, 300);
 			});
 
-			// Show notification
-			alert('Dashboard data refreshed successfully!');
+			// Show accessible notification
+			showToast('Success', 'Dashboard data refreshed successfully!');
 		}
 
 		// Animate metrics on load
@@ -746,22 +818,50 @@
 					bar.style.height = height;
 				}, 500 + (index * 100));
 			});
+
+			// Start auto-refresh when page is visible
+			startAutoRefresh();
 		});
 
-		// Auto-refresh every 30 seconds
-		setInterval(() => {
-			console.log('Auto-refresh triggered');
-			// In a real implementation, this would fetch new data from an API
-		}, 30000);
-
-		// Real-time updates simulation
-		function updateRecentTasks() {
-			const taskList = document.querySelector('.task-list');
-			// In a real implementation, this would fetch new tasks from an API
-			console.log('Checking for new tasks...');
+		// Unified auto-refresh with visibility check
+		function performAutoRefresh() {
+			if (!document.hidden) {
+				console.log('Auto-refresh triggered');
+				// In a real implementation, this would fetch new data from an API
+				// Simulated check for new tasks every 30 seconds
+			}
 		}
 
-		setInterval(updateRecentTasks, 5000);
+		function startAutoRefresh() {
+			// Clear any existing intervals
+			if (refreshIntervalId) clearInterval(refreshIntervalId);
+			
+			// Single unified refresh interval (30 seconds)
+			refreshIntervalId = setInterval(performAutoRefresh, 30000);
+		}
+
+		function stopAutoRefresh() {
+			if (refreshIntervalId) {
+				clearInterval(refreshIntervalId);
+				refreshIntervalId = null;
+			}
+		}
+
+		// Pause auto-refresh when page is hidden, resume when visible
+		document.addEventListener('visibilitychange', () => {
+			if (document.hidden) {
+				console.log('Page hidden, pausing auto-refresh');
+				stopAutoRefresh();
+			} else {
+				console.log('Page visible, resuming auto-refresh');
+				startAutoRefresh();
+			}
+		});
+
+		// Cleanup on page unload
+		window.addEventListener('beforeunload', () => {
+			stopAutoRefresh();
+		});
 	</script>
 </body>
 </html>
