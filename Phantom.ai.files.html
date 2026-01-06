@@ -863,52 +863,59 @@
 ">
                     <div class="shadow-window">
                         <div class="shadow-window-header">
-                            <span class="shadow-window-title">Actions Window <span class="badge" id="actionStatus">Awaiting</span></span>
+                            <span class="shadow-window-title">File Browser <span class="badge" id="actionStatus">Ready</span></span>
                             <div class="shadow-window-controls">
-                                <button class="window-control-btn" onclick="clearActions()" title="Clear">✕</button>
+                                <button class="window-control-btn" onclick="clearActions()" title="Refresh">↻</button>
                             </div>
                         </div>
                         <div class="shadow-window-content" id="actionsWindow">
-                            <div style="color: var(--color-medium-gray); font-style: italic;">
-State: <span id="stateDisplay">IDLE</span>
+                            <div style="color: var(--color-light-gray); font-family: var(--font-mono); font-size: 12px; line-height: 1.8;">
+<strong>Current Path:</strong> /var/www/phantom.ai/
 
-Awaiting standardized output from CENTER...
+<strong>Files (12):</strong>
+📄 index.php
+📄 functions.php  
+📄 config.php
+📄 style.css
+📄 script.js
+📄 README.md
 
-Actions:
-• Accept → Push to RIGHT (Output)
-• Reject → Return to CENTER
-• Save → Store and push to RIGHT
+<strong>Folders (3):</strong>
+📁 includes/
+📁 assets/
+📁 templates/
 
-No content pending review.
+<strong>Recent:</strong> functions.php (2m ago)
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel-header">Gating &amp; Validation</div>
+                    <div class="panel-header">File Operations</div>
                     <div class="panel-body">
                         <div class="checkbox-item">
                             <input type="checkbox" id="g1" checked="" onchange="updateCostEstimate()">
-                            <label for="g1">Include artifacts</label>
+                            <label for="g1">Show hidden files</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="g2" checked="" onchange="updateCostEstimate()">
-                            <label for="g2">AI outputs</label>
+                            <label for="g2">Preview on select</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="g3" checked="" onchange="updateCostEstimate()">
-                            <label for="g3">Learning history</label>
+                            <label for="g3">Track changes</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="g4" onchange="updateCostEstimate()">
-                            <label for="g4">Strict validation</label>
+                            <label for="g4">Auto-save edits</label>
                         </div>
 
                         <div class="divider"></div>
 
                         <div class="form-group">
-                            <label class="form-label">Validation Status</label>
-                            <div style="padding: 12px;background: #676767;border: 1px solid var(--color-dark-gray-1);border-radius: 9999px;font-size: 11px;/* color: #000; */">
-                                Pass / Fail indicators
+                            <label class="form-label">Quick Actions</label>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button style="flex: 1; padding: 10px; background: var(--accent-primary); border: none; border-radius: 8px; color: white; font-size: 11px; cursor: pointer;">New File</button>
+                                <button style="flex: 1; padding: 10px; background: var(--accent-primary); border: none; border-radius: 8px; color: white; font-size: 11px; cursor: pointer;">New Folder</button>
                             </div>
                         </div>
                     </div>
@@ -920,64 +927,81 @@ No content pending review.
 ">
                     <div class="shadow-window">
                         <div class="shadow-window-header">
-                            <span class="shadow-window-title">AI Response <span class="badge processing" id="aiStatus" style="display:none;">Processing</span></span>
+                            <span class="shadow-window-title">File Preview <span class="badge processing" id="aiStatus" style="display:none;">Loading</span></span>
                             <div class="shadow-window-controls">
                                 <button class="window-control-btn" onclick="copyAI()" title="Copy">📋</button>
-                                <button class="window-control-btn" onclick="clearAI()" title="Clear">✕</button>
+                                <button class="window-control-btn" onclick="clearAI()" title="Close">✕</button>
                             </div>
                         </div>
                         <div class="shadow-window-content" id="aiResponseWindow">
-                            <div style="color: var(--color-medium-gray); font-style: italic;">
-AI Response displays here (read-only)
+                            <div style="color: var(--color-light-gray); font-family: var(--font-mono); font-size: 11px; line-height: 1.6;">
+<strong>functions.php</strong> (4.2 KB)
 
-Source: Internal or Third-Party
+<?php
+/**
+ * Core functions
+ * @package Phantom.ai
+ */
 
-Awaiting task submission...
+function phantom_init() {
+    // Initialize system
+    load_dependencies();
+    setup_hooks();
+}
+
+// Select a file to preview...
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel-header">AI Interaction &amp; File Control</div>
+                    <div class="panel-header">File Editor &amp; Search</div>
                     <div class="panel-body">
+                        <div class="form-group">
+                            <label class="form-label">🔍 Search Files</label>
+                            <input type="text" class="form-control" placeholder="Search by name, content, or extension..." style="width: 100%; padding: 12px; background: var(--bg-shadow-window); border: var(--border-subtle); border-radius: 8px; color: var(--color-white); font-size: 13px;">
+                        </div>
+
                         <div class="file-selector">
                             <div class="file-selector-toggle" onclick="toggleFileSelector()">
-                                <span>📁 File / Project Selector</span>
+                                <span>📁 Current Directory: /var/www/phantom.ai/</span>
                                 <span id="fileSelectorArrow">▼</span>
                             </div>
                             <div class="file-selector-dropdown" id="fileDropdown">
                                 <div class="file-item" onclick="selectFile(this)">
-                                    <span>📄</span> index.php
+                                    <span>📄</span> index.php <span style="color: var(--color-medium-gray); font-size: 10px; margin-left: auto;">3.1 KB</span>
+                                </div>
+                                <div class="file-item" onclick="selectFile(this)" style="background: var(--bg-shadow-window);">
+                                    <span>📄</span> functions.php <span style="color: var(--color-medium-gray); font-size: 10px; margin-left: auto;">4.2 KB</span>
                                 </div>
                                 <div class="file-item" onclick="selectFile(this)">
-                                    <span>📄</span> functions.php
+                                    <span>📄</span> config.php <span style="color: var(--color-medium-gray); font-size: 10px; margin-left: auto;">1.8 KB</span>
                                 </div>
                                 <div class="file-item" onclick="selectFile(this)">
-                                    <span>📄</span> style.css
+                                    <span>📄</span> style.css <span style="color: var(--color-medium-gray); font-size: 10px; margin-left: auto;">12.5 KB</span>
                                 </div>
                                 <div class="file-item" onclick="selectFile(this)">
-                                    <span>📄</span> script.js
+                                    <span>📄</span> script.js <span style="color: var(--color-medium-gray); font-size: 10px; margin-left: auto;">5.7 KB</span>
                                 </div>
                                 <div class="file-item" onclick="selectFile(this)">
-                                    <span>📁</span> /includes/
+                                    <span>📁</span> includes/ <span style="color: var(--color-medium-gray); font-size: 10px; margin-left: auto;">8 items</span>
+                                </div>
+                                <div class="file-item" onclick="selectFile(this)">
+                                    <span>📁</span> assets/ <span style="color: var(--color-medium-gray); font-size: 10px; margin-left: auto;">24 items</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Task Prompt</label>
-                            <textarea class="form-textarea" id="taskPrompt" oninput="updateCostEstimate()" placeholder="Enter AI task...
+                            <label class="form-label">File Content Editor</label>
+                            <textarea class="form-textarea" id="taskPrompt" oninput="updateCostEstimate()" placeholder="Edit file content...
 
-Example: Review WordPress coding standards"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <textarea class="form-control" id="taskContext" style="min-height: 120px;resize: vertical;font-family: var(--font-mono);line-height: 1.5;font-size: 12px;width: 100%;border-radius: 20px;border-color: #6767672b;background: transparent;" placeholder="Optional constraints..."></textarea>
+Select a file to begin editing..." style="min-height: 180px; font-family: var(--font-mono); font-size: 12px; line-height: 1.6;"></textarea>
                         </div>
 
                         <button class="action-button" id="submitBtn" onclick="submitToOutput()" style="
     background: #676767;
     color: #fff;
-">Submit to Output →</button>
+">Save Changes →</button>
                     </div>
                 </div>
 
@@ -1023,84 +1047,88 @@ Example: Review WordPress coding standards"></textarea>
     /* background: linear-gradient(180deg, white 0%, #686a6b 100%); */
 ">
                         <div class="shadow-window-header">
-                            <span class="shadow-window-title">Output Area <span class="badge success" id="outputStatus" style="display:none;">Complete</span></span>
+                            <span class="shadow-window-title">File Activity Log <span class="badge success" id="outputStatus" style="display:none;">Updated</span></span>
                             <div class="shadow-window-controls">
-                                <button class="window-control-btn" onclick="saveOutput()" title="Save">💾</button>
+                                <button class="window-control-btn" onclick="saveOutput()" title="Export">📥</button>
                                 <button class="window-control-btn" onclick="clearOutputWindow()" title="Clear">✕</button>
                             </div>
                         </div>
                         <div class="shadow-window-content" id="outputWindow">
-                            <div style="color: var(--color-medium-gray); font-style: italic;">
-Final output displays here
+                            <div style="color: var(--color-light-gray); font-size: 11px; line-height: 1.8;">
+<strong style="color: var(--color-white);">Recent Activity:</strong>
 
-• Internal generated output
-• OR Copilot escalation result
-• Stored in Phantom.ai format
+<span style="color: var(--color-medium-gray);">2m ago</span> • functions.php <span style="color: var(--accent-success);">modified</span>
+<span style="color: var(--color-medium-gray);">15m ago</span> • config.php <span style="color: var(--accent-success);">created</span>
+<span style="color: var(--color-medium-gray);">1h ago</span> • style.css <span style="color: var(--accent-success);">modified</span>
+<span style="color: var(--color-medium-gray);">2h ago</span> • assets/ <span style="color: var(--accent-success);">uploaded</span>
+<span style="color: var(--color-medium-gray);">3h ago</span> • README.md <span style="color: var(--accent-success);">modified</span>
 
-Awaiting approved content from LEFT...
+<strong style="color: var(--color-white); margin-top: 12px; display: block;">File Operations History</strong>
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel-header">Output &amp; Escalation</div>
+                    <div class="panel-header">File Information &amp; Actions</div>
                     <div class="panel-body">
-                        <!-- Cost Estimator -->
+                        <!-- File Info -->
                         <div class="cost-estimator" style="
     /* background: linear-gradient(180deg, transparent 25%, #686a6bba 100%); */
 ">
                             <div class="cost-header">
-                                <span style="font-size: 10px; font-weight: 700; color: var(--color-medium-gray); text-transform: uppercase;">Estimated Cost</span>
-                                <span class="cost-value" id="costEstimate">$0.07</span>
+                                <span style="font-size: 10px; font-weight: 700; color: var(--color-medium-gray); text-transform: uppercase;">File Statistics</span>
+                                <span class="cost-value" id="costEstimate" style="font-size: 18px;">functions.php</span>
                             </div>
                             <div class="cost-breakdown">
                                 <div class="cost-line">
-                                    <span>Base:</span>
-                                    <span id="baseCost">$0.010</span>
+                                    <span>Size:</span>
+                                    <span id="baseCost">4.2 KB</span>
                                 </div>
                                 <div class="cost-line">
-                                    <span>Tier (<span id="tierName">Mid</span>):</span>
-                                    <span id="tierCost">×5</span>
+                                    <span>Lines:</span>
+                                    <span id="tierCost">157</span>
                                 </div>
                                 <div class="cost-line">
-                                    <span>Complexity:</span>
-                                    <span id="complexityCost">×1.3</span>
+                                    <span>Type:</span>
+                                    <span id="complexityCost">PHP</span>
                                 </div>
                                 <div class="cost-line">
-                                    <span>Escalation Risk:</span>
-                                    <span id="escalationRisk">10%</span>
+                                    <span>Modified:</span>
+                                    <span id="escalationRisk">2 min ago</span>
                                 </div>
                             </div>
                             <div class="cost-total">
-                                <strong>Expected:</strong>
-                                <strong id="totalCost">$0.07 - $0.20</strong>
+                                <strong>Permissions:</strong>
+                                <strong id="totalCost">rw-r--r--</strong>
                             </div>
                         </div>
 
                         <div class="form-group" style="
     background: linear-gradient(180deg, transparent 25%, #686a6bba 100%);
 ">
-                            <label class="form-label">AI Tier</label>
+                            <label class="form-label">File View Mode</label>
                             <select class="form-control" id="aiTier" onchange="updateCostEstimate()">
-                                <option value="1">Cheap (1x)</option>
-                                <option value="5" selected="">Mid (5x)</option>
-                                <option value="20">High / Copilot (20x)</option>
+                                <option value="1">Tree View</option>
+                                <option value="5" selected="">List View</option>
+                                <option value="20">Grid View</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Escalation Mode</label>
+                            <label class="form-label">Sort By</label>
                             <select class="form-control" id="escalationMode">
-                                <option selected="">Auto</option>
-                                <option>Forced</option>
+                                <option selected="">Name</option>
+                                <option>Date Modified</option>
+                                <option>Size</option>
+                                <option>Type</option>
                             </select>
                         </div>
 
-                        <button class="action-button secondary" onclick="escalateToCopilot()">Escalate to Copilot</button>
+                        <button class="action-button secondary" onclick="escalateToCopilot()">Upload Files</button>
 
                         <div class="divider"></div>
 
-                        <div class="form-label">Artifact Controls</div>
-                        <button class="action-button secondary" onclick="commitArtifact()">Commit to Artifacts</button>
+                        <div class="form-label">File Actions</div>
+                        <button class="action-button secondary" onclick="commitArtifact()">Download Selected</button>
                         <button class="action-button secondary" onclick="exportOutput()" style="
     /* width: 100%; */
     /* border-radius: 9999px; */
@@ -1111,7 +1139,7 @@ Awaiting approved content from LEFT...
     /* cursor: pointer; */
     /* transition: all 0.2s; */
     margin-top: 10px;
-">Export Output</button>
+">Delete Selected</button>
                     </div>
                 </div>
             </div>
