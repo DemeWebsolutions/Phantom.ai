@@ -1,0 +1,102 @@
+Below is a clear, authoritative clarification of both instructions, written so there is no ambiguity about scope, replacement, or intent. This is phrased to be Copilot-safe and implementation-ready.
+
+Reengineered Review Page — Required Contents
+(Full Replacement of Current Content)
+The existing Review page content must be entirely removed and replaced with the structure and elements below.
+Purpose
+The Review page is a read-only validation and decision surface for AI-generated or system-produced outputs before they are finalized, escalated, or stored.
+Required Sections
+	1	Review Summary Panel
+	◦	Displays the current task identifier
+	◦	Shows AI tier used (Cheap / Mid / Copilot)
+	◦	Shows generation timestamp
+	◦	Displays status (Pending Review / Approved / Rejected)
+	2	Output Preview Window
+	◦	Primary read-only text/code display
+	◦	Syntax-highlighted where applicable
+	◦	No inline editing permitted
+	◦	Scrollable, fixed-height container
+	3	Compliance & Validation Indicators
+	◦	Flags for:
+	▪	Formatting validity
+	▪	Standard compliance
+	▪	Security scan status (pass / warn / fail)
+	◦	Indicator-only (no configuration controls)
+	4	Review Actions (Mandatory)
+	◦	Buttons:
+	▪	Approve
+	▪	Reject
+	▪	Send Back for Revision
+	◦	Actions update system state only (no regeneration here)
+	5	Audit Metadata (Read-Only)
+	◦	Reviewer (user or system)
+	◦	Review time
+	◦	Decision outcome
+	◦	Logged automatically (no manual input)
+Explicit Exclusions
+The Review page must not contain:
+	•	Prompt editing
+	•	File uploads
+	•	AI generation controls
+	•	Settings or configuration toggles
+
+Reengineered Files Page — Required Contents
+(Full Replacement of Current Content)
+The existing Files page content must be entirely removed and replaced with the structure and elements below.
+Purpose
+The Files page is the authoritative file and asset management surface for Phantom.ai, covering project context, AI artifacts, and uploaded resources.
+Required Sections
+	1	File Navigation Panel
+	◦	Hierarchical list of:
+	▪	Project files
+	▪	Uploaded context files
+	▪	Generated artifacts
+	◦	Folder expand/collapse
+	◦	No drag-and-drop required (optional later)
+	2	File Preview Window
+	◦	Read-only preview area
+	◦	Supports:
+	▪	Code (PHP, JS, CSS, JSON)
+	▪	Text (MD, TXT)
+	▪	Images (SVG, PNG, JPG)
+	◦	Scrollable with fixed dimensions
+	3	File Metadata Panel
+	◦	File name
+	◦	File type
+	◦	Source (User Upload / AI Generated / System)
+	◦	Last modified timestamp
+	4	File Actions
+	◦	View
+	◦	Download
+	◦	Mark as Context (for AI use)
+	◦	Remove (if permitted)
+	5	Artifact Classification
+	◦	Labels indicating:
+	▪	Review output
+	▪	Copilot output
+	▪	System-generated artifact
+	◦	Read-only classification
+Explicit Exclusions
+The Files page must not contain:
+	•	AI prompt inputs
+	•	AI response generation
+	•	Review approval actions
+	•	System or security settings
+
+Replacement Rule (Non-Negotiable)
+	•	All existing content on both pages must be removed.
+	•	No legacy UI elements may remain.
+	•	These pages are single-purpose and must not overlap responsibilities with:
+	◦	Workspace
+	◦	Copilot / Cursor
+	◦	System / Settings
+
+Intent Summary
+	•	Review Page = decision & validation
+	•	Files Page = storage & inspection
+This separation is mandatory for:
+	•	Audit clarity
+	•	Learning loop accuracy
+	•	Copilot escalation correctness
+	•	Long-term maintainability
+These instructions are now fully clarified and ready for implementation.
