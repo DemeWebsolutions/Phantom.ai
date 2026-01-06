@@ -1696,6 +1696,68 @@ Exporting full audit log...
         updateCostEstimate();
     </script>
 
+    <!-- Legal Footer (Always Present) -->
+    <div class="footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-panel); color: var(--color-medium-gray); padding: 12px 20px; text-align: center; font-size: 0.75rem; border-top: var(--border-subtle); z-index: 1000;">
+        <p style="margin: 0;">© 2025 - <script>document.write(new Date().getFullYear())</script> My Deme, LLC. All Rights Reserved. | Phantom.ai Self-Managing Cloud/VPS Automation System</p>
+        <p style="margin: 4px 0 0 0;">Protected under Florida State Law and United States Federal Law | <strong>PROPRIETARY AND CONFIDENTIAL</strong></p>
+    </div>
+
+    <!-- Session Timeout Warning -->
+    <div id="sessionWarning" style="display: none; position: fixed; top: 70px; right: 20px; background: #fbbf24; color: #78350f; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); z-index: 9998; font-weight: 500;">
+        ⚠️ Session will expire in <span id="timeoutCounter">5:00</span> due to inactivity
+    </div>
+
+    <script>
+        // Session Management (Frontend Security)
+        (function() {
+            const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+            const WARNING_TIME = 5 * 60 * 1000;     // 5 minutes warning
+            let timeoutId, warningId;
+
+            function resetTimers() {
+                clearTimeout(timeoutId);
+                clearTimeout(warningId);
+                document.getElementById('sessionWarning').style.display = 'none';
+
+                warningId = setTimeout(showWarning, SESSION_TIMEOUT - WARNING_TIME);
+                timeoutId = setTimeout(logout, SESSION_TIMEOUT);
+            }
+
+            function showWarning() {
+                document.getElementById('sessionWarning').style.display = 'block';
+                let timeLeft = WARNING_TIME / 1000;
+                const countdown = setInterval(() => {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    const counter = document.getElementById('timeoutCounter');
+                    if (counter) {
+                        counter.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                    if (timeLeft <= 0) clearInterval(countdown);
+                }, 1000);
+            }
+
+            function logout() {
+                alert('Session expired due to inactivity.\n\nYou will be returned to the login page.');
+                sessionStorage.clear();
+                window.location.href = 'Phantom.ai.portal.html';
+            }
+
+            ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+                document.addEventListener(event, resetTimers, { passive: true });
+            });
+
+            // Check if user has acknowledged legal terms
+            if (!sessionStorage.getItem('legal_acknowledged')) {
+                alert('Legal terms not acknowledged.\n\nPlease login again.');
+                window.location.href = 'Phantom.ai.portal.html';
+            }
+
+            resetTimers();
+        })();
+    </script>
+
 
 
 </body></html>

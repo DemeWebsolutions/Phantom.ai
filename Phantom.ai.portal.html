@@ -273,6 +273,104 @@
             margin-bottom: 28px;
             border-right-width: 4px;
         }
+
+        /* Legal Modal Styles */
+        .legal-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .legal-modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            max-width: 50rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .legal-modal-content h2 {
+            color: #dc2626;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #dc2626;
+            padding-bottom: 1rem;
+        }
+
+        .legal-modal-content h3 {
+            color: #676767;
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .legal-text {
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .legal-text ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-text li {
+            margin-bottom: 0.5rem;
+        }
+
+        .legal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 9999px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+            transform: scale(1.02);
+        }
+
+        .legal-actions .btn-primary {
+            margin-bottom: 0;
+            padding: 0.875rem 2rem;
+        }
+
+        /* Session Timeout Warning */
+        .session-warning {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #fbbf24;
+            color: #78350f;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 9998;
+            display: none;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -358,16 +456,174 @@
                 <button type="button" class="btn btn-secondary" id="signUpBtn">
                     Sign up
                 </button>
-            <div class="footer" style="
-">
-            <p>My Deme, LLC | Florida, United States</p>
-            <p class="copyright">My Deme, LLC. © 2025 - <script>document.write(new Date().getFullYear())</script> All Rights Reserved.</p>
-            <p style="font-size: 1em;margin-top: 8px;">Protected under Florida State Law and United States Federal Law</p>
-        </div></form>
+            </form>
         </div>
     </main>
 
+    <!-- Legal Footer (Always Present) -->
+    <div class="footer">
+        <p class="copyright">© 2025 - <script>document.write(new Date().getFullYear())</script> My Deme, LLC. All Rights Reserved.</p>
+        <p>Phantom.ai Self-Managing Cloud/VPS Automation System</p>
+        <p>Protected under Florida State Law and United States Federal Law</p>
+        <p><strong>PROPRIETARY AND CONFIDENTIAL</strong></p>
+        <p style="font-size: 0.8em; margin-top: 8px;">Unauthorized access, use, or distribution is strictly prohibited and may result in civil and criminal penalties.</p>
+    </div>
+
+    <!-- Legal Acknowledgment Modal -->
+    <div id="legalModal" class="legal-modal" style="display: none;">
+        <div class="legal-modal-content">
+            <h2>⚠️ LEGAL NOTICE & TERMS OF USE</h2>
+            <div class="legal-text">
+                <h3>PROPRIETARY SYSTEM NOTICE</h3>
+                <p>You are accessing a proprietary system owned and operated by My Deme, LLC.</p>
+                
+                <h3>TERMS AND CONDITIONS</h3>
+                <ul>
+                    <li>This system and all its contents are confidential and proprietary.</li>
+                    <li>Unauthorized access, use, disclosure, or distribution is strictly prohibited.</li>
+                    <li>All activities are monitored and logged for security purposes.</li>
+                    <li>You acknowledge that you have authorized access to this system.</li>
+                    <li>You agree to comply with all applicable laws and regulations.</li>
+                    <li>Sessions will automatically expire after 30 minutes of inactivity.</li>
+                </ul>
+
+                <h3>LEGAL PROTECTIONS</h3>
+                <p>This system is protected under:</p>
+                <ul>
+                    <li>Florida State Law</li>
+                    <li>United States Federal Law</li>
+                    <li>Trade Secret and Intellectual Property Protections</li>
+                </ul>
+
+                <h3>VIOLATIONS & PENALTIES</h3>
+                <p>Unauthorized access or use may result in:</p>
+                <ul>
+                    <li>Immediate termination of access</li>
+                    <li>Civil liability and damages</li>
+                    <li>Criminal prosecution under state and federal law</li>
+                </ul>
+
+                <p style="margin-top: 20px;"><strong>By clicking "I Acknowledge and Agree" below, you confirm that you have read, understood, and agree to abide by these terms.</strong></p>
+            </div>
+            <div class="legal-actions">
+                <button id="legalDeclineBtn" class="btn btn-danger">Decline & Logout</button>
+                                <button id="legalAcceptBtn" class="btn btn-primary">I Acknowledge and Agree</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Timeout Warning -->
+    <div id="sessionWarning" class="session-warning">
+        ⚠️ Session will expire in <span id="timeoutCounter">5:00</span> due to inactivity
+    </div>
+
     <script>
+        // Security Configuration
+        const SECURITY_CONFIG = {
+            SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes in milliseconds
+            WARNING_TIME: 5 * 60 * 1000,     // Show warning 5 minutes before timeout
+            ACCESS_LOG_KEY: 'phantom_access_log'
+        };
+
+        // Access Logging
+        function logAccess(event, details = {}) {
+            const accessLog = JSON.parse(localStorage.getItem(SECURITY_CONFIG.ACCESS_LOG_KEY) || '[]');
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                event: event,
+                ip: 'CLIENT_SIDE', // Server-side would provide real IP
+                userAgent: navigator.userAgent,
+                ...details
+            };
+            accessLog.push(logEntry);
+            
+            // Keep only last 100 entries
+            if (accessLog.length > 100) {
+                accessLog.shift();
+            }
+            
+            localStorage.setItem(SECURITY_CONFIG.ACCESS_LOG_KEY, JSON.stringify(accessLog));
+            console.log('[Access Log]', logEntry);
+        }
+
+        // Session Timeout Manager
+        class SessionManager {
+            constructor() {
+                this.timeoutId = null;
+                this.warningId = null;
+                this.warningShown = false;
+                this.sessionStart = Date.now();
+                this.lastActivity = Date.now();
+            }
+
+            startSession() {
+                this.resetTimers();
+                this.addActivityListeners();
+                logAccess('SESSION_START');
+            }
+
+            resetTimers() {
+                clearTimeout(this.timeoutId);
+                clearTimeout(this.warningId);
+                this.lastActivity = Date.now();
+                this.hideWarning();
+
+                // Set warning timer (5 minutes before timeout)
+                this.warningId = setTimeout(() => {
+                    this.showWarning();
+                }, SECURITY_CONFIG.SESSION_TIMEOUT - SECURITY_CONFIG.WARNING_TIME);
+
+                // Set logout timer (30 minutes)
+                this.timeoutId = setTimeout(() => {
+                    this.logout('TIMEOUT');
+                }, SECURITY_CONFIG.SESSION_TIMEOUT);
+            }
+
+            showWarning() {
+                this.warningShown = true;
+                const warningElement = document.getElementById('sessionWarning');
+                warningElement.style.display = 'block';
+                
+                let timeLeft = SECURITY_CONFIG.WARNING_TIME / 1000;
+                const countdown = setInterval(() => {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    document.getElementById('timeoutCounter').textContent = 
+                        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                    }
+                }, 1000);
+                
+                logAccess('SESSION_WARNING');
+            }
+
+            hideWarning() {
+                this.warningShown = false;
+                const warningElement = document.getElementById('sessionWarning');
+                warningElement.style.display = 'none';
+            }
+
+            addActivityListeners() {
+                ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+                    document.addEventListener(event, () => this.resetTimers(), { passive: true });
+                });
+            }
+
+            logout(reason = 'USER_LOGOUT') {
+                logAccess('LOGOUT', { reason: reason });
+                alert(`Session ended: ${reason}\n\nYou will be returned to the login page.`);
+                // Clear any session data
+                sessionStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        // Initialize session manager
+        const sessionManager = new SessionManager();
+
         // Password toggle functionality
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
@@ -382,7 +638,7 @@
             eyeOffIcon.classList.toggle('hidden');
         });
 
-        // Form submission
+        // Form submission with Legal Modal
         const loginForm = document.getElementById('loginForm');
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -390,23 +646,63 @@
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('rememberMe').checked;
             
-            console.log('Login attempted:', { username, password, rememberMe });
-            alert('Login submitted! Check console for details.');
+            // Log access attempt
+            logAccess('LOGIN_ATTEMPT', { username: username });
+            
+            // Show legal acknowledgment modal
+            showLegalModal(username, password, rememberMe);
         });
+
+        // Legal Modal Functionality
+        function showLegalModal(username, password, rememberMe) {
+            const modal = document.getElementById('legalModal');
+            modal.style.display = 'flex';
+            
+            // Accept button
+            document.getElementById('legalAcceptBtn').onclick = function() {
+                modal.style.display = 'none';
+                logAccess('LEGAL_ACCEPTED', { username: username });
+                
+                // Simulate successful login
+                sessionStorage.setItem('phantom_user', username);
+                sessionStorage.setItem('phantom_session', Date.now().toString());
+                sessionStorage.setItem('legal_acknowledged', 'true');
+                
+                // Start session management
+                sessionManager.startSession();
+                
+                // Redirect to dashboard (simulate with alert for now)
+                alert(`Welcome ${username}!\n\nSession started with enhanced security:\n- Auto-logout after 30 min of inactivity\n- All actions are logged\n- Legal terms acknowledged\n\nRedirecting to Workspace...`);
+                
+                // In production, redirect to workspace:
+                // window.location.href = 'Phantom.ai.workspace.html';
+            };
+            
+            // Decline button
+            document.getElementById('legalDeclineBtn').onclick = function() {
+                modal.style.display = 'none';
+                logAccess('LEGAL_DECLINED', { username: username });
+                alert('You must agree to the terms to access the system.\n\nLogin cancelled.');
+                loginForm.reset();
+            };
+        }
 
         // Sign up button
         const signUpBtn = document.getElementById('signUpBtn');
         signUpBtn.addEventListener('click', function() {
-            console.log('Sign up clicked');
-            alert('Sign up functionality would be implemented here.');
+            logAccess('SIGNUP_CLICKED');
+            alert('Sign up functionality requires backend implementation.\n\nFeatures will include:\n- 2FA/MFA setup\n- Email verification\n- Password strength requirements');
         });
 
         // Forgot password button
         const forgotPassword = document.getElementById('forgotPassword');
         forgotPassword.addEventListener('click', function() {
-            console.log('Forgot password clicked');
-            alert('Password recovery would be implemented here.');
+            logAccess('PASSWORD_RESET_REQUESTED');
+            alert('Password recovery requires backend implementation.\n\nFeatures will include:\n- Email verification\n- 2FA verification\n- Secure reset link');
         });
+
+        // Log page load
+        logAccess('PAGE_LOAD');
     </script>
 
 
