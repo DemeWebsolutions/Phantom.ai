@@ -352,6 +352,14 @@
             padding: var(--space-lg);
             overflow: hidden;
             background: var(--bg-main);
+            width: fit-content;
+            height: fit-content;
+            padding-right: 50px;
+            padding-bottom: 70px;
+            margin-bottom: unset;
+            border-bottom-width: 100px;
+            padding-left: 20px;
+            padding-top: 20px;
         }
 
         .three-column-grid {
@@ -566,12 +574,13 @@
             font-size: 12px;
             width: 100%;
             border-radius: 20px;
-            border-color: #6767672b;
+            border-color: #a1a1a13d;
             padding-left: 10px;
             padding-top: 10px;
             padding-right: 10px;
             padding-bottom: 10px;
             color: #676767;
+            min-height: fit-content;
         }
 
         .file-selector-dropdown.open {
@@ -873,7 +882,7 @@
 Current Workspace: <span id="stateDisplay" style="color: var(--accent-success);">Production-v1.2</span>
 
 Active Projects: 3
-Team Members: 12
+Active Files: 12
 Pending Tasks: 8
 
 Recent Activity:
@@ -894,7 +903,7 @@ Workspace health: ✓ Operational
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="g2" checked="" onchange="updateCostEstimate()">
-                            <label for="g2">Team notifications</label>
+                            <label for="g2">Project notifications</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="g3" checked="" onchange="updateCostEstimate()">
@@ -934,7 +943,7 @@ Workspace health: ✓ Operational
 
 Status: In Progress
 Due Date: Jan 15, 2026
-Team: 5 members
+Contributors: 5 users
 
 Last Update: Added new feature module
 Next Milestone: Beta release
@@ -972,7 +981,7 @@ Select a project below to view details...
 
                         <div class="form-group">
                             <label class="form-label">Task Assignment</label>
-                            <textarea class="form-textarea" id="taskPrompt" oninput="updateCostEstimate()" placeholder="Assign task to team member...
+                            <textarea class="form-textarea" id="taskPrompt" oninput="updateCostEstimate()" placeholder="Assign task to user...
 
 Example: @john_doe Review feature implementation for Project Alpha"></textarea>
                         </div>
@@ -1040,7 +1049,7 @@ Example: @john_doe Review feature implementation for Project Alpha"></textarea>
                             <div style="color: var(--color-medium-gray); font-style: italic;">
 <span style="color: var(--accent-success);">▸</span> 2 min ago - Task completed by @jane_smith
 <span style="color: #676767;">▸</span> 15 min ago - New commit pushed to Alpha
-<span style="color: #676767;">▸</span> 1 hr ago - Team meeting scheduled
+<span style="color: #676767;">▸</span> 1 hr ago - Project sync scheduled
 <span style="color: var(--accent-success);">▸</span> 2 hr ago - PR #145 approved
 
 Live updates from workspace activity...
@@ -1085,9 +1094,9 @@ Live updates from workspace activity...
                         <div class="form-group" style="
     background: linear-gradient(180deg, transparent 25%, #686a6bba 100%);
 ">
-                            <label class="form-label">Team Role</label>
+                            <label class="form-label">User Role</label>
                             <select class="form-control" id="aiTier" onchange="updateCostEstimate()">
-                                <option value="1">Member</option>
+                                <option value="1">Contributor</option>
                                 <option value="5" selected="">Manager</option>
                                 <option value="20">Admin</option>
                             </select>
