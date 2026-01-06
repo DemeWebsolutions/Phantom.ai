@@ -3,42 +3,54 @@
 
 ## Overview
 
-This document provides a comprehensive architecture and implementation plan for deploying the Phantom.ai backend on a private home office network using Mac resources with corporate-grade security.
+This document provides a comprehensive architecture and implementation plan for deploying the Phantom.ai backend on a private home office network using **your current Mac** with corporate-grade security.
+
+**Key Advantage:** By using your existing Mac as the server, you avoid the ~$800 hardware cost while maintaining enterprise-level security and functionality.
 
 ---
 
 ## Architecture Summary
 
-**Deployment Model:** Private home network with local Mac server  
+**Deployment Model:** Private home network using current Mac as dedicated server  
 **Security Level:** Corporate-grade with multi-layer protection  
 **Network Type:** Isolated/segmented private network  
-**Access Model:** LAN-only (no external internet exposure)
+**Access Model:** LAN-only (no external internet exposure)  
+**Hardware Cost:** ~$250-400 (external backup SSD + UPS only)
 
 ---
 
 ## 1. Infrastructure Requirements
 
-### Hardware (Mac Resources)
+### Hardware (Using Current Mac)
+
+**Your Current Mac Setup:**
+This deployment uses your **current Mac computer** as the server. The system will check your existing hardware specifications and ensure they meet minimum requirements.
 
 **Minimum Requirements:**
-- **Mac Model:** Mac Mini (2018+), iMac, or Mac Studio
+- **Mac Model:** Mac Mini (2018+), iMac, Mac Studio, or MacBook Pro
 - **CPU:** Apple M1/M2 or Intel i5+ (4+ cores)
-- **RAM:** 16GB minimum, 32GB recommended
+- **RAM:** 16GB minimum, 32GB recommended for optimal performance
 - **Storage:** 512GB SSD minimum (1TB recommended)
   - 100GB for OS and applications
   - 200GB for database and logs
   - 200GB for backups
   - Remaining for system growth
 
+**Note:** If your current Mac doesn't meet minimum specs, the installation script will provide recommendations for optimization (e.g., external storage for database/backups).
+
 **Network Infrastructure:**
-- Gigabit Ethernet connection (wired, not WiFi)
+- Gigabit Ethernet connection (wired preferred over WiFi for security and stability)
 - Dedicated VLAN for Phantom.ai services (optional but recommended)
 - Static IP address on local network
 - Router with firewall capabilities
 
+**Required Additional Hardware:**
+- **External SSD** (1-2TB) for automated encrypted backups (~$100-200)
+- **UPS** (Uninterruptible Power Supply) for power protection (~$150)
+
 **Backup Storage:**
-- External SSD or NAS for automated backups
-- Time Machine backup drive
+- External SSD or NAS for automated backups (required)
+- Time Machine backup drive (recommended)
 - Offsite backup solution (encrypted cloud or physical)
 
 ---
@@ -482,6 +494,40 @@ Response:
 ---
 
 ## 6. Installation & Setup Guide
+
+### Step 0: Check Your Mac Specifications
+
+Before proceeding, verify your current Mac meets minimum requirements:
+
+```bash
+# Check macOS version
+sw_vers
+
+# Check RAM
+sysctl hw.memsize | awk '{print $2/1024/1024/1024 " GB"}'
+
+# Check available disk space
+df -h / | awk 'NR==2 {print $4 " available"}'
+
+# Check CPU info
+sysctl -n machdep.cpu.brand_string
+sysctl -n hw.physicalcpu  # Physical cores
+sysctl -n hw.logicalcpu   # Logical cores (with hyperthreading)
+
+# Check network interface
+ifconfig | grep "inet " | grep -v 127.0.0.1
+```
+
+**Minimum Requirements Checklist:**
+- [ ] macOS 12.0+ (Monterey or newer)
+- [ ] 16GB+ RAM
+- [ ] 200GB+ free disk space
+- [ ] 4+ CPU cores
+- [ ] Wired Ethernet connection available
+
+**If requirements not met:** Consider using external SSD for database storage or upgrading RAM if possible.
+
+---
 
 ### Step 1: Prepare Mac Server
 
@@ -946,24 +992,40 @@ https://phantom.local
 
 ## 11. Cost & Resource Estimates
 
-### One-Time Costs
+### One-Time Costs (Using Current Mac)
 
-- Mac Mini M2 (16GB RAM, 512GB): ~$799
-- External SSD (2TB backup): ~$200
-- Uninterruptible Power Supply (UPS): ~$150
-- **Total:** ~$1,150
+Since you're using your **current Mac** as the server, hardware costs are minimal:
+
+- **Current Mac:** $0 (already owned)
+- **External SSD (1-2TB backup):** ~$100-200
+- **Uninterruptible Power Supply (UPS):** ~$150 (highly recommended)
+- **Network cables/accessories:** ~$20-50 (if needed)
+- **Total:** ~$250-400 (instead of $1,150)
+
+**Note:** This deployment leverages your existing Mac hardware, significantly reducing upfront costs while maintaining corporate-grade security.
 
 ### Monthly Costs
 
-- Electricity (~5W idle, 20W peak): ~$2/month
-- Internet bandwidth: $0 (LAN only)
-- **Total:** ~$2/month
+- **Electricity:** ~$2-5/month (depending on Mac model and usage)
+  - Apple Silicon (M1/M2): ~5-10W idle, 15-25W peak → ~$2/month
+  - Intel Macs: ~10-20W idle, 40-65W peak → ~$3-5/month
+- **Internet bandwidth:** $0 (LAN-only deployment)
+- **Total:** ~$2-5/month
 
 ### Time Investment
 
-- Initial setup: 8-12 hours
-- Monthly maintenance: 2-4 hours
+- **Initial setup:** 8-12 hours (one-time)
+- **Monthly maintenance:** 2-4 hours
 - **Annual time:** ~50 hours
+
+### Resource Usage (Your Mac)
+
+The Phantom.ai backend will use approximately:
+- **Disk Space:** 100-300GB (database, logs, backups)
+- **RAM:** 4-8GB (PostgreSQL, Node.js, Redis, Nginx)
+- **CPU:** 5-15% average (spikes during AI task processing)
+
+**Your Mac remains usable for other tasks** - the server processes run in the background with minimal performance impact.
 
 ---
 
