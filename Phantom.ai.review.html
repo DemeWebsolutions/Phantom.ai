@@ -863,85 +863,94 @@
 ">
                     <div class="shadow-window">
                         <div class="shadow-window-header">
-                            <span class="shadow-window-title">Actions Window <span class="badge" id="actionStatus">Awaiting</span></span>
+                            <span class="shadow-window-title">Pending Reviews <span class="badge processing" id="actionStatus">3 Active</span></span>
                             <div class="shadow-window-controls">
-                                <button class="window-control-btn" onclick="clearActions()" title="Clear">✕</button>
+                                <button class="window-control-btn" onclick="refreshReviews()" title="Refresh">↻</button>
                             </div>
                         </div>
                         <div class="shadow-window-content" id="actionsWindow">
-                            <div style="color: var(--color-medium-gray); font-style: italic;">
-State: <span id="stateDisplay">IDLE</span>
+                            <div style="color: var(--color-medium-gray);">
+<strong>Review Queue (3 pending):</strong>
 
-Awaiting standardized output from CENTER...
+📝 PR #247 - functions.php refactor
+⏱️ Opened: 2h ago by @johndoe
 
-Actions:
-• Accept → Push to RIGHT (Output)
-• Reject → Return to CENTER
-• Save → Store and push to RIGHT
+📝 PR #248 - Update authentication logic  
+⏱️ Opened: 5h ago by @janesmith
 
-No content pending review.
+📝 PR #249 - Add new API endpoints
+⏱️ Opened: 1d ago by @mikebrown
+
+<strong>Status:</strong> Awaiting your approval
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel-header">Gating &amp; Validation</div>
+                    <div class="panel-header">Review Filters</div>
                     <div class="panel-body">
                         <div class="checkbox-item">
-                            <input type="checkbox" id="g1" checked="" onchange="updateCostEstimate()">
-                            <label for="g1">Include artifacts</label>
+                            <input type="checkbox" id="g1" checked="">
+                            <label for="g1">Show my reviews</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="g2" checked="" onchange="updateCostEstimate()">
-                            <label for="g2">AI outputs</label>
+                            <input type="checkbox" id="g2" checked="">
+                            <label for="g2">Pending approval</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="g3" checked="" onchange="updateCostEstimate()">
-                            <label for="g3">Learning history</label>
+                            <input type="checkbox" id="g3" checked="">
+                            <label for="g3">Changes requested</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="g4" onchange="updateCostEstimate()">
-                            <label for="g4">Strict validation</label>
+                            <input type="checkbox" id="g4">
+                            <label for="g4">Approved reviews</label>
                         </div>
 
                         <div class="divider"></div>
 
                         <div class="form-group">
-                            <label class="form-label">Validation Status</label>
-                            <div style="padding: 12px;background: #676767;border: 1px solid var(--color-dark-gray-1);border-radius: 9999px;font-size: 11px;/* color: #000; */">
-                                Pass / Fail indicators
+                            <label class="form-label">Quick Actions</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="action-button secondary" style="flex: 1;">View All</button>
+                                <button class="action-button secondary" style="flex: 1;">My Reviews</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CENTER COLUMN: AI INTERACTION & FILE CONTROL -->
+                <!-- CENTER COLUMN: CODE REVIEW & DIFF VIEWER -->
                 <div class="column-panel" style="
     background: linear-gradient(180deg, transparent 60%, #686a6bba 100%);
 ">
                     <div class="shadow-window">
                         <div class="shadow-window-header">
-                            <span class="shadow-window-title">AI Response <span class="badge processing" id="aiStatus" style="display:none;">Processing</span></span>
+                            <span class="shadow-window-title">Code Review <span class="badge success" id="aiStatus">PR #247</span></span>
                             <div class="shadow-window-controls">
-                                <button class="window-control-btn" onclick="copyAI()" title="Copy">📋</button>
-                                <button class="window-control-btn" onclick="clearAI()" title="Clear">✕</button>
+                                <button class="window-control-btn" onclick="copyCode()" title="Copy">📋</button>
+                                <button class="window-control-btn" onclick="nextPR()" title="Next">→</button>
                             </div>
                         </div>
                         <div class="shadow-window-content" id="aiResponseWindow">
-                            <div style="color: var(--color-medium-gray); font-style: italic;">
-AI Response displays here (read-only)
+                            <div style="color: var(--color-medium-gray);">
+<strong>functions.php refactor</strong>
 
-Source: Internal or Third-Party
+<span style="color: var(--accent-success);">+</span> function validateUser($data) {
+<span style="color: var(--accent-success);">+</span>     return filter_var($data, FILTER_SANITIZE);
+<span style="color: var(--accent-success);">+</span> }
 
-Awaiting task submission...
+<span style="color: var(--accent-danger);">-</span> function validate_user($data) {
+<span style="color: var(--accent-danger);">-</span>     return strip_tags($data);
+<span style="color: var(--accent-danger);">-</span> }
+
+<strong>Files changed: 2 • +24 -18 lines</strong>
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel-header">AI Interaction &amp; File Control</div>
+                    <div class="panel-header">Review Details & Comments</div>
                     <div class="panel-body">
                         <div class="file-selector">
                             <div class="file-selector-toggle" onclick="toggleFileSelector()">
-                                <span>📁 File / Project Selector</span>
+                                <span>📝 Pull Request: #247</span>
                                 <span id="fileSelectorArrow">▼</span>
                             </div>
                             <div class="file-selector-dropdown" id="fileDropdown">
@@ -964,24 +973,30 @@ Awaiting task submission...
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Task Prompt</label>
-                            <textarea class="form-textarea" id="taskPrompt" oninput="updateCostEstimate()" placeholder="Enter AI task...
+                            <label class="form-label">Review Comment</label>
+                            <textarea class="form-textarea" id="taskPrompt" placeholder="Add your review comment...
 
-Example: Review WordPress coding standards"></textarea>
+Example: LGTM! Code looks good. Please update the documentation."></textarea>
                         </div>
 
                         <div class="form-group">
-                            <textarea class="form-control" id="taskContext" style="min-height: 120px;resize: vertical;font-family: var(--font-mono);line-height: 1.5;font-size: 12px;width: 100%;border-radius: 20px;border-color: #6767672b;background: transparent;" placeholder="Optional constraints..."></textarea>
+                            <label class="form-label">Changed Files</label>
+                            <div style="padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--color-dark-gray-1); border-radius: 8px; font-size: 11px; color: var(--color-medium-gray);">
+                                📄 functions.php (+24 -18)<br>
+                                📄 includes/validation.php (+12 -5)
+                            </div>
                         </div>
 
-                        <button class="action-button" id="submitBtn" onclick="submitToOutput()" style="
-    background: #676767;
-    color: #fff;
-">Submit to Output →</button>
+                        <button class="action-button accept" id="submitBtn" style="width: 100%; margin-bottom: 8px;">
+    ✓ Approve & Merge
+</button>
+                        <button class="action-button reject" style="width: 100%;">
+    ✗ Request Changes
+</button>
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN: OUTPUT & ESCALATION -->
+                <!-- RIGHT COLUMN: REVIEW HISTORY & ACTIVITY -->
                 <div class="column-panel" style="
     .phantom-shadow-window {
     background: linear-gradient(
@@ -1023,85 +1038,93 @@ Example: Review WordPress coding standards"></textarea>
     /* background: linear-gradient(180deg, white 0%, #686a6b 100%); */
 ">
                         <div class="shadow-window-header">
-                            <span class="shadow-window-title">Output Area <span class="badge success" id="outputStatus" style="display:none;">Complete</span></span>
+                            <span class="shadow-window-title">Review Activity <span class="badge success" id="outputStatus">12 Reviews</span></span>
                             <div class="shadow-window-controls">
-                                <button class="window-control-btn" onclick="saveOutput()" title="Save">💾</button>
-                                <button class="window-control-btn" onclick="clearOutputWindow()" title="Clear">✕</button>
+                                <button class="window-control-btn" onclick="exportReviews()" title="Export">📥</button>
+                                <button class="window-control-btn" onclick="refreshActivity()" title="Refresh">↻</button>
                             </div>
                         </div>
                         <div class="shadow-window-content" id="outputWindow">
-                            <div style="color: var(--color-medium-gray); font-style: italic;">
-Final output displays here
+                            <div style="color: var(--color-medium-gray);">
+<strong>Recent Reviews:</strong>
 
-• Internal generated output
-• OR Copilot escalation result
-• Stored in Phantom.ai format
+2h ago • PR #247 - @you reviewed
+Status: Pending approval
 
-Awaiting approved content from LEFT...
+5h ago • PR #246 - @janesmith approved
+Status: Merged to main
+
+1d ago • PR #245 - @mikebrown requested changes
+Status: Updated by author
+
+<strong>Your Review Stats:</strong>
+Approved: 8 | Changes Requested: 3 | Pending: 1
+                            </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel-header">Output &amp; Escalation</div>
+                    <div class="panel-header">Review Statistics & Actions</div>
                     <div class="panel-body">
-                        <!-- Cost Estimator -->
+                        <!-- Review Stats -->
                         <div class="cost-estimator" style="
     /* background: linear-gradient(180deg, transparent 25%, #686a6bba 100%); */
 ">
                             <div class="cost-header">
-                                <span style="font-size: 10px; font-weight: 700; color: var(--color-medium-gray); text-transform: uppercase;">Estimated Cost</span>
-                                <span class="cost-value" id="costEstimate">$0.07</span>
+                                <span style="font-size: 10px; font-weight: 700; color: var(--color-medium-gray); text-transform: uppercase;">PR Metrics</span>
+                                <span class="cost-value" id="costEstimate">#247</span>
                             </div>
                             <div class="cost-breakdown">
                                 <div class="cost-line">
-                                    <span>Base:</span>
-                                    <span id="baseCost">$0.010</span>
+                                    <span>Author:</span>
+                                    <span id="baseCost">@johndoe</span>
                                 </div>
                                 <div class="cost-line">
-                                    <span>Tier (<span id="tierName">Mid</span>):</span>
-                                    <span id="tierCost">×5</span>
+                                    <span>Files Changed:</span>
+                                    <span id="tierCost">2</span>
                                 </div>
                                 <div class="cost-line">
-                                    <span>Complexity:</span>
-                                    <span id="complexityCost">×1.3</span>
+                                    <span>Lines:</span>
+                                    <span id="complexityCost">+24 -18</span>
                                 </div>
                                 <div class="cost-line">
-                                    <span>Escalation Risk:</span>
-                                    <span id="escalationRisk">10%</span>
+                                    <span>Status:</span>
+                                    <span id="escalationRisk">Pending</span>
                                 </div>
                             </div>
                             <div class="cost-total">
-                                <strong>Expected:</strong>
-                                <strong id="totalCost">$0.07 - $0.20</strong>
+                                <strong>Opened:</strong>
+                                <strong id="totalCost">2 hours ago</strong>
                             </div>
                         </div>
 
                         <div class="form-group" style="
     background: linear-gradient(180deg, transparent 25%, #686a6bba 100%);
 ">
-                            <label class="form-label">AI Tier</label>
-                            <select class="form-control" id="aiTier" onchange="updateCostEstimate()">
-                                <option value="1">Cheap (1x)</option>
-                                <option value="5" selected="">Mid (5x)</option>
-                                <option value="20">High / Copilot (20x)</option>
+                            <label class="form-label">Review Priority</label>
+                            <select class="form-control" id="aiTier">
+                                <option value="1">Low</option>
+                                <option value="5" selected="">Normal</option>
+                                <option value="20">Urgent</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Escalation Mode</label>
+                            <label class="form-label">Assign Reviewer</label>
                             <select class="form-control" id="escalationMode">
-                                <option selected="">Auto</option>
-                                <option>Forced</option>
+                                <option selected="">@janesmith</option>
+                                <option>@mikebrown</option>
+                                <option>@sarahjones</option>
                             </select>
                         </div>
 
-                        <button class="action-button secondary" onclick="escalateToCopilot()">Escalate to Copilot</button>
+                        <button class="action-button secondary">Request Another Review</button>
 
                         <div class="divider"></div>
 
-                        <div class="form-label">Artifact Controls</div>
-                        <button class="action-button secondary" onclick="commitArtifact()">Commit to Artifacts</button>
-                        <button class="action-button secondary" onclick="exportOutput()" style="
+                        <div class="form-label">Review Actions</div>
+                        <button class="action-button secondary">View Diff</button>
+                        <button class="action-button secondary" style="
     /* width: 100%; */
     /* border-radius: 9999px; */
     /* padding: 1rem; */
@@ -1111,7 +1134,7 @@ Awaiting approved content from LEFT...
     /* cursor: pointer; */
     /* transition: all 0.2s; */
     margin-top: 10px;
-">Export Output</button>
+">Export Review</button>
                     </div>
                 </div>
             </div>
