@@ -671,11 +671,8 @@
                 // Start session management
                 sessionManager.startSession();
                 
-                // Redirect to dashboard (simulate with alert for now)
-                alert(`Welcome ${username}!\n\nSession started with enhanced security:\n- Auto-logout after 30 min of inactivity\n- All actions are logged\n- Legal terms acknowledged\n\nRedirecting to Workspace...`);
-                
-                // In production, redirect to workspace:
-                // window.location.href = 'Phantom.ai.workspace.html';
+                // Redirect to workspace
+                window.location.href = 'Phantom.ai.workspace.html';
             };
             
             // Decline button
