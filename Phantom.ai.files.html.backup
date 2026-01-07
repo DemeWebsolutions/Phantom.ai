@@ -858,9 +858,9 @@
         <!-- MAIN CONTENT: CENTER → LEFT → RIGHT WORKFLOW -->
         <div class="main-content">
             <div class="three-column-grid">
-                <!-- LEFT COLUMN: FILE NAVIGATION TREE -->
+                <!-- LEFT COLUMN: GATING & ACTIONS -->
                 <div class="column-panel" style="
-    background: linear-gradient(180deg, transparent 60%, #686a6bba 100%);
+    background: linear-gradient(180deg, transparent 25%, #686a6bba 100%);
     /* border-radius: 1.5rem; */
     /* box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); */
     /* padding: 3rem; */
@@ -897,7 +897,7 @@
                         </div>
                     </div>
 
-                    <div class="panel-header">File Browser Options</div>
+                    <div class="panel-header">File Operations</div>
                     <div class="panel-body">
                         <div class="checkbox-item">
                             <input type="checkbox" id="g1" checked="" onchange="updateCostEstimate()">
@@ -921,14 +921,14 @@
                         <div class="form-group">
                             <label class="form-label">Quick Actions</label>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button style="flex: 1; padding: 10px; background: var(--accent-primary); border: none; border-radius: 8px; color: white; font-size: 11px; cursor: pointer;">+ New File</button>
-                                <button style="flex: 1; padding: 10px; background: var(--accent-primary); border: none; border-radius: 8px; color: white; font-size: 11px; cursor: pointer;">+ New Folder</button>
+                                <button style="flex: 1; padding: 10px; background: var(--accent-primary); border: none; border-radius: 8px; color: white; font-size: 11px; cursor: pointer;">New File</button>
+                                <button style="flex: 1; padding: 10px; background: var(--accent-primary); border: none; border-radius: 8px; color: white; font-size: 11px; cursor: pointer;">New Folder</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CENTER COLUMN: FILE PREVIEW & EDITOR -->
+                <!-- CENTER COLUMN: AI INTERACTION & FILE CONTROL -->
                 <div class="column-panel" style="
     background: linear-gradient(180deg, transparent 60%, #686a6bba 100%);
 ">
@@ -961,7 +961,7 @@ function phantom_init() {
                         </div>
                     </div>
 
-                    <div class="panel-header">File Search & Editor</div>
+                    <div class="panel-header">File Editor &amp; Search</div>
                     <div class="panel-body">
                         <div class="form-group">
                             <label class="form-label">🔍 Search Files</label>
@@ -1012,9 +1012,43 @@ Select a file to begin editing..." style="min-height: 180px; font-family: var(--
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN: FILE METADATA & ACTIVITY LOG -->
+                <!-- RIGHT COLUMN: OUTPUT & ESCALATION -->
                 <div class="column-panel" style="
-    background: linear-gradient(180deg, transparent 60%, #686a6bba 100%);
+    .phantom-shadow-window {
+    background: linear-gradient(
+    180deg,
+    #161c2f 0%,
+    #121826 100%
+  );
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    box-shadow:
+    0 8px 24px rgba(0,0,0,0.55);
+    padding: 16px;
+    margin-bottom: 16px;
+};
+    background: linear-gradient(180deg, transparent 25%, #686a6bba 100%);
+    /* background: linear-gradient(    180deg,    #161c2f 0%,    #121826 100%  ); */
+    border-radius: 1.5rem;
+    /* box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); */
+    /* padding: 3rem; */
+    /* width: 100%; */
+    /* max-width: 28rem; */
+    /* background: linear-gradient(
+    180deg,
+    #161c2f 0%,
+    #121826 100%
+  ); */
+    /* border: 1px solid rgba(255,255,255,0.08); */
+    /* border-radius: 10px; */
+    /* box-shadow:
+    0 6px 18px rgba(0,0,0,0.45); */
+    /* padding: 16px; */
+    /* background: linear-gradient(
+    180deg,
+    #161c2f 0%,
+    #121826 100%
+  ); */
 ">
                     <div class="shadow-window" style="
     /* background: linear-gradient(180deg, white 0%, #686a6b 100%); */
@@ -1044,7 +1078,9 @@ Select a file to begin editing..." style="min-height: 180px; font-family: var(--
                     <div class="panel-header">File Information &amp; Actions</div>
                     <div class="panel-body">
                         <!-- File Info -->
-                        <div class="cost-estimator">
+                        <div class="cost-estimator" style="
+    /* background: linear-gradient(180deg, transparent 25%, #686a6bba 100%); */
+">
                             <div class="cost-header">
                                 <span style="font-size: 10px; font-weight: 700; color: var(--color-medium-gray); text-transform: uppercase;">File Statistics</span>
                                 <span class="cost-value" id="costEstimate" style="font-size: 18px;">functions.php</span>
@@ -1073,7 +1109,9 @@ Select a file to begin editing..." style="min-height: 180px; font-family: var(--
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="
+    background: linear-gradient(180deg, transparent 25%, #686a6bba 100%);
+">
                             <label class="form-label">File View Mode</label>
                             <select class="form-control" id="aiTier" onchange="updateCostEstimate()">
                                 <option value="1">Tree View</option>
