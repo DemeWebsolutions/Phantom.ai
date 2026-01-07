@@ -1,0 +1,287 @@
+<?php
+/**
+ * Phantom.ai Dashboard
+ * Main dashboard interface with authentication
+ *
+ * @package PhantomAI\Dashboard
+ */
+
+require_once __DIR__ . '/includes/security.php';
+
+// Enforce localhost access
+enforce_localhost();
+
+// Initialize session
+init_security_session();
+
+// Check authentication
+if ( ! is_authenticated() ) {
+header( 'Location: login.php' );
+exit;
+}
+
+// Handle logout
+if ( isset( $_GET['logout'] ) ) {
+logout_user();
+header( 'Location: login.php' );
+exit;
+}
+
+$username = $_SESSION['username'] ?? 'User';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom.ai Dashboard</title>
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <style>
+        .security-banner {
+            background-color: rgba(243, 156, 18, 0.15);
+            border-bottom: 2px solid var(--warning-color);
+            padding: 0.75rem 2rem;
+            text-align: center;
+            color: var(--warning-color);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .security-banner::before {
+            content: "⚠️ ";
+        }
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background-color: var(--error-color);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.3s;
+            margin-left: 1rem;
+        }
+        .btn-logout:hover {
+            background-color: #c0392b;
+        }
+        .user-info {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-right: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="security-banner">
+        Internal system. Authorized access only. All activity is logged.
+    </div>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="logo-section">
+                <svg class="logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="80" fill="#4a90e2" opacity="0.2"/>
+                    <path d="M 100 40 L 120 80 L 160 80 L 130 105 L 145 145 L 100 120 L 55 145 L 70 105 L 40 80 L 80 80 Z" fill="#4a90e2"/>
+                    <text x="100" y="180" text-anchor="middle" font-size="20" fill="#ffffff">Phantom.ai</text>
+                </svg>
+                <h1>Phantom.ai Dashboard</h1>
+            </div>
+            <div class="header-actions">
+                <button id="refresh-btn" class="btn-refresh">Refresh Data</button>
+            </div>
+                <span class="user-info">👤 <?php echo htmlspecialchars( $username ); ?></span>
+                <button id="refresh-btn" class="btn-refresh">Refresh Data</button>
+                <a href="?logout=1" class="btn-logout">Logout</a>
+        </header>
+
+        <nav class="dashboard-nav">
+            <button class="nav-btn active" data-view="overview">System Overview</button>
+            <button class="nav-btn" data-view="workflow">Workflow Pipeline</button>
+        </nav>
+
+        <main class="dashboard-main">
+            <!-- System Overview Dashboard -->
+            <div id="overview-view" class="dashboard-view active">
+                <div class="dashboard-grid">
+                    <!-- System Status Panel -->
+                    <div class="panel panel-status">
+                        <h2 class="panel-title">System Status</h2>
+                        <div class="panel-content">
+                            <div class="status-item">
+                                <span class="status-label">PHP Version:</span>
+                                <span class="status-value" id="php-version">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">PHPCS Status:</span>
+                                <span class="status-value status-badge" id="phpcs-status">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Semgrep Status:</span>
+                                <span class="status-value status-badge" id="semgrep-status">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Last Run:</span>
+                                <span class="status-value" id="last-run">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Last Review Summary Panel -->
+                    <div class="panel panel-summary">
+                        <h2 class="panel-title">Last Review Summary</h2>
+                        <div class="panel-content">
+                            <div class="summary-item">
+                                <div class="summary-count error-count" id="error-count">0</div>
+                                <div class="summary-label">Errors</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-count warning-count" id="warning-count">0</div>
+                                <div class="summary-label">Warnings</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-count notice-count" id="notice-count">0</div>
+                                <div class="summary-label">Notices</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Artifacts Panel -->
+                    <div class="panel panel-artifacts">
+                        <h2 class="panel-title">Artifacts</h2>
+                        <div class="panel-content">
+                            <div class="artifact-item">
+                                <span class="artifact-icon">📄</span>
+                                <span class="artifact-name">phantom-report.json</span>
+                                <span class="artifact-status" id="artifact-json">--</span>
+                            </div>
+                            <div class="artifact-item">
+                                <span class="artifact-icon">🔍</span>
+                                <span class="artifact-name">phantom-report.sarif</span>
+                                <span class="artifact-status" id="artifact-sarif">--</span>
+                            </div>
+                            <div class="artifact-item">
+                                <span class="artifact-icon">🔧</span>
+                                <span class="artifact-name">Raw Tool Outputs</span>
+                                <span class="artifact-status" id="artifact-raw">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Tier Usage Panel -->
+                    <div class="panel panel-tier-usage">
+                        <h2 class="panel-title">AI Tier Usage</h2>
+                        <div class="panel-content">
+                            <div class="tier-item">
+                                <div class="tier-label">
+                                    <span class="tier-icon tier-cheap">⚡</span>
+                                    <span>Cheap Tier</span>
+                                </div>
+                                <div class="tier-count" id="tier-cheap-count">0</div>
+                            </div>
+                            <div class="tier-item">
+                                <div class="tier-label">
+                                    <span class="tier-icon tier-mid">🔄</span>
+                                    <span>Mid Tier</span>
+                                </div>
+                                <div class="tier-count" id="tier-mid-count">0</div>
+                            </div>
+                            <div class="tier-item">
+                                <div class="tier-label">
+                                    <span class="tier-icon tier-high">🚀</span>
+                                    <span>High Tier (Copilot)</span>
+                                </div>
+                                <div class="tier-count" id="tier-high-count">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Copilot Escalations Panel -->
+                    <div class="panel panel-escalations">
+                        <h2 class="panel-title">Copilot Escalations</h2>
+                        <div class="panel-content">
+                            <div class="escalation-stat">
+                                <div class="stat-label">Total Escalations</div>
+                                <div class="stat-value" id="total-escalations">0</div>
+                            </div>
+                            <div class="escalation-stat">
+                                <div class="stat-label">Success Rate</div>
+                                <div class="stat-value success-rate" id="success-rate">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Pipeline View -->
+            <div id="workflow-view" class="dashboard-view">
+                <div class="workflow-pipeline">
+                    <div class="pipeline-node" data-node="intake">
+                        <div class="node-icon">📥</div>
+                        <div class="node-title">Task Intake</div>
+                        <div class="node-status" id="node-intake-status">idle</div>
+                        <div class="node-count" id="node-intake-count">0</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+
+                    <div class="pipeline-node" data-node="cheap">
+                        <div class="node-icon">⚡</div>
+                        <div class="node-title">Cheap Tier</div>
+                        <div class="node-subtitle">Plan / Classify</div>
+                        <div class="node-status" id="node-cheap-status">idle</div>
+                        <div class="node-count" id="node-cheap-count">0</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+
+                    <div class="pipeline-node" data-node="comprehension">
+                        <div class="node-icon">✓</div>
+                        <div class="node-title">Comprehension Gate</div>
+                        <div class="node-subtitle">Yes / No</div>
+                        <div class="node-status" id="node-comprehension-status">idle</div>
+                        <div class="node-count" id="node-comprehension-count">0</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+
+                    <div class="pipeline-node" data-node="mid">
+                        <div class="node-icon">🔄</div>
+                        <div class="node-title">Mid Tier</div>
+                        <div class="node-subtitle">Review / Test</div>
+                        <div class="node-status" id="node-mid-status">idle</div>
+                        <div class="node-count" id="node-mid-count">0</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+
+                    <div class="pipeline-node" data-node="high">
+                        <div class="node-icon">🚀</div>
+                        <div class="node-title">High Tier</div>
+                        <div class="node-subtitle">Copilot</div>
+                        <div class="node-status" id="node-high-status">idle</div>
+                        <div class="node-count" id="node-high-count">0</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+
+                    <div class="pipeline-node" data-node="artifacts">
+                        <div class="node-icon">📦</div>
+                        <div class="node-title">Artifacts Generated</div>
+                        <div class="node-status" id="node-artifacts-status">idle</div>
+                        <div class="node-count" id="node-artifacts-count">0</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+
+                    <div class="pipeline-node" data-node="learning">
+                        <div class="node-icon">🧠</div>
+                        <div class="node-title">Learning Engine</div>
+                        <div class="node-subtitle">Update</div>
+                        <div class="node-status" id="node-learning-status">idle</div>
+                        <div class="node-count" id="node-learning-count">0</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="dashboard-footer">
+            <p>&copy; 2025 Deme Web Solutions / My Deme, LLC - Phantom.ai Dashboard</p>
+            <p class="footer-notice">Proprietary Software - All Rights Reserved</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>
