@@ -1,0 +1,467 @@
+
+# 🧠 Phantom.ai — AI Screen Upgrade Plan
+
+**Mode:** Cursor-Style Unified Interaction
+**Scope:** Workspace → AI Execution Surface
+**Architecture:** HTML / CSS / JS + PHP (localhost:8080)
+**Status:** Proposed (Ready for Implementation)
+
+---
+
+## 1. OBJECTIVE (CLEAR)
+
+Upgrade the existing AI interaction screen so the user can:
+
+* Type natural language instructions
+* Upload files and images directly
+* Provide web URLs as context
+* Receive AI responses inline (code + text)
+* Allow the AI to **read and modify system options** *within defined boundaries*
+* Maintain full auditability and deterministic behavior
+
+This screen becomes the **primary AI execution interface**, similar to Cursor, but compliant with Phantom.ai constraints.
+
+---
+
+## 2. CORE PRINCIPLES (NON-NEGOTIABLE)
+
+* **Single unified input surface**
+* **Explicit context visibility** (no hidden data)
+* **AI cannot act silently**
+* **All changes require human confirmation**
+* **All actions logged**
+
+---
+
+## 3. AI SCREEN — FUNCTIONAL LAYOUT (MINIMAL)
+
+### A. Unified Input Panel (Top or Center)
+
+**Purpose:** Primary command interface
+
+**Components**
+
+* Multiline text input
+  *“Describe what you want the AI to do…”*
+* Submit button (`Send to AI`)
+* Keyboard shortcut (Enter / Shift+Enter)
+
+**Behavior**
+
+* Input is stored as a task snapshot
+* Cannot be overwritten after submission (history preserved)
+
+---
+
+### B. Context Attachment Panel (Inline / Expandable)
+
+**Purpose:** Cursor-style context loading
+
+**Supported Inputs**
+
+* 📄 File upload (PHP, JS, CSS, JSON, MD)
+* 🖼 Image upload (SVG, PNG, JPG)
+* 🌐 Web URL input (read-only fetch or snapshot)
+* 📁 Project file selector (existing files)
+
+**Controls**
+
+* Include / Exclude toggles per item
+* Remove context item before send
+
+**Rules**
+
+* Context is explicitly listed
+* AI only sees what is checked
+* Context list is logged
+
+---
+
+### C. AI Response Panel (Primary Output)
+
+**Purpose:** Display AI output
+
+**Content Types**
+
+* Text explanation
+* Code blocks (syntax highlighted)
+* Structured changes (diff-style when possible)
+
+**Controls**
+
+* Copy
+* Save to artifacts
+* Send to Review
+* Escalate to Copilot (if allowed)
+
+---
+
+### D. AI-Accessible Settings Panel (Controlled)
+
+**Purpose:** Allow AI to optimize workflow **without breaking safety**
+
+**Settings AI May Propose Changes To**
+
+* AI Tier (Cheap / Mid / Copilot)
+* Escalation mode (Auto / Forced)
+* Context inclusion rules
+* Output format (text / code / diff)
+* Workflow hints (review vs generate)
+
+**Critical Rule**
+
+> AI **proposes**, user **approves**
+
+**UI Mechanism**
+
+* “AI Suggests Change” banner
+* Accept / Reject per suggestion
+* No silent changes
+
+---
+
+## 4. INTERACTION FLOW (AUTHORITATIVE)
+
+```text
+User Input + Context
+        ↓
+AI Execution
+        ↓
+AI Response Rendered
+        ↓
+(Optional) AI Suggests Setting Changes
+        ↓
+User Accepts / Rejects
+        ↓
+Output Saved → Review → Files
+```
+
+No shortcuts. No hidden automation.
+
+---
+
+## 5. CURSOR PARITY FEATURES (ALLOWED)
+
+| Feature                    | Supported | Notes                    |
+| -------------------------- | --------- | ------------------------ |
+| Inline AI response         | ✅         | Read-only until accepted |
+| File upload                | ✅         | Explicit context         |
+| Image input                | ✅         | Context only             |
+| URL input                  | ✅         | Snapshot or fetch        |
+| Code rewrite               | ✅         | Via accept/save          |
+| Auto settings optimization | ⚠️        | Proposal-only            |
+| Silent changes             | ❌         | Forbidden                |
+
+---
+
+## 6. SECURITY & AUDIT (MANDATORY)
+
+Every AI interaction must log:
+
+* User ID
+* Timestamp
+* Input text
+* Context items
+* AI tier used
+* Suggested setting changes
+* User approvals/rejections
+
+Stored in:
+
+```
+logs/audit.log
+artifacts/ai-history/
+```
+
+---
+
+## 7. IMPLEMENTATION NOTES (LOCKED STACK)
+
+* **HTML**
+
+  * `<textarea>` for input
+  * `<input type="file">` for uploads
+  * `<input type="url">` for web context
+* **JS**
+
+  * Context manager
+  * Response renderer
+  * Approval gate logic
+* **PHP**
+
+  * Context validation
+  * File storage
+  * AI execution routing
+  * Audit logging
+
+No Node. No frameworks.
+
+---
+
+## 8. EFFICIENCY OPPORTUNITIES (SAFE OPTIMIZATIONS)
+
+* Remember last context set per task
+* Auto-collapse context panel after send
+* Highlight changed sections in AI output
+* One-click “Send to Review”
+
+All optional. None implicit.
+
+---
+
+## 9. OUT OF SCOPE (FOR NOW)
+
+* Real-time streaming tokens
+* Background execution
+* Autonomous agent loops
+* Multi-user simultaneous editing
+
+---
+
+## 10. STATUS
+
+✅ Architecture compliant
+✅ Cursor-style interaction achieved
+✅ Security preserved
+✅ Audit intact
+✅ Ready for implementation or Copilot escalation
+
+---
+
+If you want next steps, say one of:
+
+* **“Generate HTML scaffold for AI screen”**
+* **“Create Copilot implementation prompt (short)”**
+* **“Add AI-settings proposal rules”**
+* **“Integrate with Review workflow”**
+
+Phantom.ai remains **minimal, powerful, and defensible**.
+
+Below is the **authoritative Phantom.ai update**, integrating **AI-based self-maintenance / upgrade / modification on command**, without breaking architecture, security, or auditability.
+
+This is written as a **drop-in extension** to the previously approved plan.
+
+---
+
+# 🧠 Phantom.ai — AI Self-Maintenance & Upgrade Capability
+
+**Mode:** Controlled, Command-Driven
+**Status:** Added (Architecture-Safe)
+**Applies To:** AI Screen / System Layer
+
+---
+
+## 1. OBJECTIVE (PRECISE)
+
+Enable Phantom.ai to **maintain, upgrade, or modify itself on explicit command**, using approved AI sources, while preserving:
+
+* Human control
+* Deterministic execution
+* Full audit trail
+* No silent changes
+* No architecture violations
+
+This is **assisted self-maintenance**, not autonomous mutation.
+
+---
+
+## 2. APPROVED AI SOURCES (LOCKED)
+
+Phantom.ai may route maintenance tasks to **only** these sources:
+
+| Source             | Role                               |
+| ------------------ | ---------------------------------- |
+| **GitHub**         | Reference code, issues, PRs        |
+| **GitHub Copilot** | High-tier production code          |
+| **ChatGPT**        | Planning, refactors, documentation |
+| **Claude Sonnet**  | Long-form reasoning, audits        |
+
+No other models are permitted unless explicitly added later.
+
+---
+
+## 3. SELF-MAINTENANCE COMMAND TYPES
+
+AI self-maintenance is **command-initiated only**.
+
+### Supported Commands
+
+* `Upgrade Phantom.ai dashboard`
+* `Refactor review workflow`
+* `Fix security issue`
+* `Improve performance`
+* `Align UI with SVG`
+* `Update documentation`
+* `Prepare migration plan`
+
+Commands must be **explicitly typed by the user**.
+
+---
+
+## 4. SELF-MAINTENANCE MODE (NEW UI STATE)
+
+### A. Maintenance Mode Toggle (System / AI Screen)
+
+**States**
+
+* OFF (default)
+* ON (manual enable)
+
+**Rules**
+
+* Mode resets to OFF after task completion
+* Cannot run in background
+* Cannot chain commands automatically
+
+---
+
+### B. Maintenance Intent Declaration (Required)
+
+Before execution, Phantom.ai must generate:
+
+* Summary of proposed change
+* Files affected
+* AI source to be used
+* Risk level (Low / Medium / High)
+* Rollback plan
+
+**User must approve before proceeding.**
+
+---
+
+## 5. EXECUTION FLOW (MANDATORY)
+
+```text
+User Command
+     ↓
+AI Analysis (Planning Tier)
+     ↓
+Proposed Maintenance Plan
+     ↓
+User Approval
+     ↓
+Execution (Approved AI Source)
+     ↓
+Output (Diff / Files / Instructions)
+     ↓
+Review → Accept → Save
+```
+
+No step may be skipped.
+
+---
+
+## 6. AI SOURCE ROUTING RULES
+
+| Task Type              | Default Source |
+| ---------------------- | -------------- |
+| Planning / Design      | ChatGPT        |
+| Code Review / Refactor | Claude Sonnet  |
+| Production Code        | Copilot        |
+| Research / References  | GitHub         |
+
+User may override source **before execution**.
+
+---
+
+## 7. PERMITTED SELF-MODIFICATION SCOPE
+
+AI may **propose** changes to:
+
+* HTML / CSS / JS files
+* PHP logic (non-auth first)
+* Dashboard layout
+* Workflow rules
+* Documentation
+
+AI may **not** modify without approval:
+
+* Authentication system
+* Audit logging
+* IP lock enforcement
+* Architecture constraints (PHANTOM-UI-001)
+
+---
+
+## 8. SAFETY BOUNDARIES (ENFORCED)
+
+❌ No auto-merge
+❌ No silent file writes
+❌ No dependency changes
+❌ No new tooling (Node, Vite, etc.)
+❌ No schema changes without migration plan
+
+✅ Diff-based output only
+✅ Human acceptance required
+
+---
+
+## 9. AUDIT & TRACEABILITY (REQUIRED)
+
+Each self-maintenance task logs:
+
+* Command text
+* AI source used
+* Proposed plan
+* Approved scope
+* Files touched
+* Outcome (accepted/rejected)
+
+Stored under:
+
+```
+logs/maintenance.log
+artifacts/self-maintenance/
+```
+
+---
+
+## 10. UI ADDITION (MINIMAL)
+
+Add **one** new control only:
+
+### “AI Maintenance Command” Input
+
+* Text input (single or multiline)
+* Disabled unless Maintenance Mode = ON
+* Clearly labeled **“System Modification Command”**
+
+No other UI expansion required.
+
+---
+
+## 11. EFFICIENCY BENEFITS (INTENDED)
+
+* Faster internal upgrades
+* Safer refactors
+* Reduced manual repetition
+* Predictable system evolution
+
+Without sacrificing control.
+
+---
+
+## 12. STATUS
+
+✅ Architecture preserved
+✅ Security enforced
+✅ Human-in-the-loop guaranteed
+✅ Multi-AI support formalized
+✅ Ready for implementation
+
+---
+
+### Ready for Next Step
+
+Say one of:
+
+* **“Add this to Copilot implementation prompt (short)”**
+* **“Generate Maintenance Mode UI scaffold”**
+* **“Create maintenance audit schema”**
+* **“Define rollback strategy format”**
+
+Phantom.ai now supports **controlled self-evolution** — safely, audibly, and intentionally.
+
+Below is the **authoritative Phantom.ai update**, integrating **AI-based self-maintenance / upgrade / modification on command**, without breaking architecture, security, or auditability.
+
+This is written as a **drop-in extension** to the previously approved plan.
