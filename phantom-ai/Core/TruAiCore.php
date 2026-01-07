@@ -354,46 +354,76 @@ class TruAiCore
 
     /**
      * Enforce UI policy
+     * 
+     * @param array $context
+     * @return bool
+     * 
+     * @todo Implement actual UI policy enforcement logic based on PHANTOM-UI-001 specification
      */
     private function enforceUIPolicy(array $context): bool
     {
-        // Implement UI policy enforcement logic
+        // Placeholder: Implement UI policy enforcement logic
+        // Should validate UI framework constraints, localhost-only execution, etc.
         return true;
     }
 
     /**
      * Enforce localhost only policy
+     * 
+     * @param array $context
+     * @return bool
+     * 
+     * @todo Implement actual localhost validation
      */
     private function enforceLocalhostOnly(array $context): bool
     {
-        // Implement localhost policy enforcement logic
+        // Placeholder: Implement localhost policy enforcement logic
+        // Should verify execution is only on localhost
         return true;
     }
 
     /**
      * Enforce security immutability
+     * 
+     * @param array $context
+     * @return bool
+     * 
+     * @todo Implement security immutability checks
      */
     private function enforceSecurityImmutability(array $context): bool
     {
-        // Implement security immutability enforcement logic
+        // Placeholder: Implement security immutability enforcement logic
+        // Should prevent modifications to security-critical components
         return true;
     }
 
     /**
      * Enforce audit completeness
+     * 
+     * @param array $context
+     * @return bool
+     * 
+     * @todo Implement audit completeness validation
      */
     private function enforceAuditCompleteness(array $context): bool
     {
-        // Implement audit completeness enforcement logic
+        // Placeholder: Implement audit completeness enforcement logic
+        // Should ensure all operations are properly logged
         return true;
     }
 
     /**
      * Enforce deterministic behavior
+     * 
+     * @param array $context
+     * @return bool
+     * 
+     * @todo Implement deterministic behavior validation
      */
     private function enforceDeterministicBehavior(array $context): bool
     {
-        // Implement deterministic behavior enforcement logic
+        // Placeholder: Implement deterministic behavior enforcement logic
+        // Should ensure predictable execution patterns
         return true;
     }
 

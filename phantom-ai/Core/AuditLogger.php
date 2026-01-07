@@ -42,7 +42,7 @@ class AuditLogger
             'ai_source' => $interaction['ai_source'] ?? null,
             'suggested_changes' => $interaction['suggested_changes'] ?? [],
             'user_approvals' => $interaction['user_approvals'] ?? [],
-            'outcome' => $interaction['outcome'] ?? 'pending'
+            'outcome' => $interaction['outcome'] ?? 'not_specified' // Require explicit outcome
         ];
 
         self::writeLog(self::AUDIT_LOG_PATH, $entry);

@@ -843,8 +843,17 @@
             
             console.log('AUDIT LOG:', auditEntry);
             
-            // In production, this would send to backend
-            // fetch('/api/audit-log', { method: 'POST', body: JSON.stringify(auditEntry) });
+            // PRODUCTION NOTE: In production, this should send to backend API
+            // Example implementation:
+            // fetch('/api/truai/audit-log', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(auditEntry)
+            // }).then(response => {
+            //     if (!response.ok) {
+            //         console.error('Failed to log audit entry');
+            //     }
+            // });
         }
     </script>
 </body>
