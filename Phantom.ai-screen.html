@@ -655,39 +655,181 @@
             // Show processing status
             updateStatus('Processing...');
             
-            // Simulate AI response (in production, this would call the backend)
-            setTimeout(() => {
-                showAIResponse(input);
-                updateStatus('Response Received');
-            }, 1500);
+            // Call the API to get AI source arbitration
+            getAIRecommendation(input);
         }
 
-        function showAIResponse(input) {
+        async function getAIRecommendation(input) {
+            try {
+                // Determine task type based on input keywords
+                const taskType = determineTaskType(input);
+                
+                // Get included context files
+                const includedFiles = contextItems
+                    .filter(item => item.included)
+                    .map(item => item.name);
+                
+                // Get current AI tier from settings
+                const currentTier = document.getElementById('ai-tier').value;
+                
+                // Call the arbitration API
+                const response = await fetch('/api/truai/arbitrate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        task_type: taskType,
+                        description: input,
+                        context: {
+                            files: includedFiles,
+                            tier: currentTier,
+                            maintenance_mode: maintenanceMode
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAIResponse(input, data);
+                    updateStatus('Response Received');
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                updateStatus('Error connecting to API');
+                // Fall back to simulated response
+                showAIResponseFallback(input);
+            }
+        }
+
+        function determineTaskType(input) {
+            const inputLower = input.toLowerCase();
+            
+            // Match task types based on keywords
+            if (inputLower.includes('review') || inputLower.includes('audit') || inputLower.includes('check')) {
+                return 'code_review';
+            } else if (inputLower.includes('refactor') || inputLower.includes('optimize') || inputLower.includes('improve')) {
+                return 'refactor';
+            } else if (inputLower.includes('create') || inputLower.includes('generate') || inputLower.includes('build') || inputLower.includes('implement')) {
+                return 'production_code';
+            } else if (inputLower.includes('plan') || inputLower.includes('design') || inputLower.includes('architect')) {
+                return 'planning';
+            } else if (inputLower.includes('research') || inputLower.includes('find') || inputLower.includes('search')) {
+                return 'research';
+            } else {
+                return 'planning'; // Default to planning for general queries
+            }
+        }
+
+        function showAIResponse(input, apiData) {
             const responseDiv = document.getElementById('ai-response');
             
-            // Simulate response based on input
+            const source = apiData.recommended_source;
+            const reason = apiData.reason;
+            const taskType = apiData.task_type;
+            
+            // Map AI source to tier name
+            const tierMap = {
+                'chatgpt': 'Cheap-Tier',
+                'claude': 'Mid-Tier (Claude Sonnet)',
+                'copilot': 'High-Tier (Copilot)',
+                'github': 'Research'
+            };
+            
+            const tierName = tierMap[source] || source;
+            
+            let response = `<div style="color: var(--color-light);">`;
+            response += `<strong>Command Received:</strong> ${input}<br><br>`;
+            response += `<strong>Task Type:</strong> ${taskType.replace(/_/g, ' ')}<br>`;
+            response += `<strong>Context Items:</strong> ${contextItems.filter(i => i.included).length}<br><br>`;
+            response += `<strong>TruAi Recommendation:</strong><br>`;
+            response += `<strong>Recommended Tier:</strong> ${tierName}<br>`;
+            response += `<strong>AI Source:</strong> ${source.toUpperCase()}<br>`;
+            response += `<strong>Reason:</strong> ${reason}<br><br>`;
+            
+            // Add action recommendations based on source
+            if (source === 'copilot') {
+                response += `<em>Use "Escalate to Copilot" button to proceed with production code generation.</em>`;
+            } else if (source === 'claude') {
+                response += `<em>This task is suitable for code review and refactoring workflow.</em>`;
+            } else if (source === 'chatgpt') {
+                response += `<em>This task is suitable for planning and documentation workflow.</em>`;
+            } else if (source === 'github') {
+                response += `<em>Use GitHub search and examples for reference implementation.</em>`;
+            }
+            
+            response += `</div>`;
+            responseDiv.innerHTML = response;
+            
+            // Update AI tier selector to match recommendation
+            updateTierSelector(source);
+        }
+
+        function showAIResponseFallback(input) {
+            // Fallback to simulated response if API is unavailable
+            const responseDiv = document.getElementById('ai-response');
+            
             let response = `<div style="color: var(--color-light);">`;
             response += `<strong>Command Received:</strong> ${input}<br><br>`;
             response += `<strong>Context Items:</strong> ${contextItems.length}<br><br>`;
-            response += `<strong>Recommended Action:</strong><br>`;
+            response += `<strong>Recommended Action (Simulated):</strong><br>`;
+            response += `<em style="color: #ff8800;">Note: Using fallback response. API unavailable.</em><br><br>`;
             
             if (input.toLowerCase().includes('create') || input.toLowerCase().includes('generate')) {
                 response += `This is a code generation task. Recommending <strong>High-Tier (Copilot)</strong> execution.<br><br>`;
                 response += `<strong>Suggested AI Source:</strong> GitHub Copilot<br>`;
-                response += `<strong>Estimated Complexity:</strong> Medium<br>`;
-                response += `<strong>Files to be created/modified:</strong> TBD based on task analysis<br><br>`;
-                response += `<em>Use "Escalate to Copilot" button to proceed with implementation.</em>`;
             } else if (input.toLowerCase().includes('review')) {
                 response += `This is a code review task. Recommending <strong>Mid-Tier (Claude Sonnet)</strong> execution.<br><br>`;
                 response += `<strong>Suggested AI Source:</strong> Claude Sonnet<br>`;
-                response += `<strong>Review Type:</strong> Security & Best Practices<br>`;
             } else {
-                response += `This appears to be a planning or documentation task. Processing with <strong>Cheap-Tier</strong> AI.<br><br>`;
+                response += `This appears to be a planning task. Processing with <strong>Cheap-Tier</strong> AI.<br><br>`;
                 response += `<strong>Suggested AI Source:</strong> ChatGPT<br>`;
             }
             
             response += `</div>`;
             responseDiv.innerHTML = response;
+        }
+
+        function updateTierSelector(aiSource) {
+            const tierSelect = document.getElementById('ai-tier');
+            
+            // Map AI source to tier value
+            const sourceToTier = {
+                'chatgpt': 'cheap',
+                'claude': 'mid',
+                'copilot': 'copilot',
+                'github': 'cheap'
+            };
+            
+            const tierValue = sourceToTier[aiSource];
+            if (tierValue && tierSelect.value !== tierValue) {
+                tierSelect.value = tierValue;
+                
+                // Show suggestion banner if tier changed
+                showTierSuggestion(aiSource, tierValue);
+            }
+        }
+
+        function showTierSuggestion(aiSource, tierValue) {
+            const suggestionDiv = document.getElementById('ai-suggestion');
+            const suggestionContent = document.getElementById('suggestion-content');
+            
+            const tierNames = {
+                'cheap': 'Cheap/Fast Tier',
+                'mid': 'Mid-Tier',
+                'copilot': 'High-Tier (Copilot)'
+            };
+            
+            suggestionContent.textContent = `TruAi recommends switching to ${tierNames[tierValue]} for optimal ${aiSource.toUpperCase()} processing.`;
+            suggestionDiv.style.display = 'block';
         }
 
         function handleFileUpload(event) {

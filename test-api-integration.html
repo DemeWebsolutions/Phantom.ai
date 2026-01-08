@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test TruAi API Integration</title>
+</head>
+<body>
+    <h1>Testing /api/truai/arbitrate Integration</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testAPIIntegration() {
+            const results = document.getElementById('results');
+            
+            const testCases = [
+                {
+                    name: 'Code Review Task',
+                    input: {
+                        task_type: 'code_review',
+                        description: 'Review security in auth.php',
+                        context: { files: ['auth.php'], tier: 'mid' }
+                    }
+                },
+                {
+                    name: 'Production Code Task',
+                    input: {
+                        task_type: 'production_code',
+                        description: 'Create a product grid block',
+                        context: { files: [], tier: 'copilot' }
+                    }
+                },
+                {
+                    name: 'Planning Task',
+                    input: {
+                        task_type: 'planning',
+                        description: 'Plan new feature architecture',
+                        context: { files: [], tier: 'cheap' }
+                    }
+                }
+            ];
+            
+            for (const testCase of testCases) {
+                results.innerHTML += `<h3>Testing: ${testCase.name}</h3>`;
+                
+                try {
+                    const response = await fetch('/api/truai/arbitrate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(testCase.input)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        results.innerHTML += `
+                            <p style="color: green;">✓ Success</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
+                    } else {
+                        results.innerHTML += `
+                            <p style="color: orange;">⚠ API returned error</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
+                    }
+                } catch (error) {
+                    results.innerHTML += `
+                        <p style="color: red;">✗ Error: ${error.message}</p>
+                    `;
+                }
+            }
+        }
+        
+        // Run tests when page loads
+        testAPIIntegration();
+    </script>
+</body>
+</html>
